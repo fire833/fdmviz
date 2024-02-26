@@ -1,20 +1,19 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { PerspectiveCamera, Scene, WebGLRenderer } from 'three';
-  import Renderer from '../graphics/renderer';
+  import Simulator from '../graphics/simulator';
 
-  let viewport: HTMLElement;
-  let renderer = new Renderer();
+  let container: HTMLElement;
+  let sim = new Simulator();
 
   function animate() {
-    requestAnimationFrame(animate);
-    renderer.render();
+    sim.render();
+    requestAnimationFrame(animate); // TODO: use setAnimationLoop to not use this recursively
   }
 
   onMount(() => {
-    viewport.appendChild(renderer.get_dom_element());
+    container.appendChild(sim.getHTMLElement());
     animate();
   });
 </script>
 
-<div bind:this={viewport}></div>
+<div bind:this={container}></div>

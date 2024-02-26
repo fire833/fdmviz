@@ -8,9 +8,9 @@ import {
   WebGLRenderer,
 } from 'three';
 
-export default class Renderer {
+export default class Simulator {
   private scene: Scene;
-  private wgl: WebGLRenderer;
+  private webgl: WebGLRenderer;
   private camera: PerspectiveCamera;
 
   private cube: Mesh;
@@ -18,7 +18,7 @@ export default class Renderer {
   constructor() {
     this.scene = new Scene();
     this.scene.background = new Color(0x303030);
-    this.wgl = new WebGLRenderer();
+    this.webgl = new WebGLRenderer();
     this.camera = new PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
@@ -33,16 +33,16 @@ export default class Renderer {
     this.scene.add(this.cube);
 
     // Default to full size of the window.
-    this.wgl.setSize(window.innerWidth, window.innerHeight);
+    this.webgl.setSize(window.innerWidth, window.innerHeight);
   }
 
   public render() {
     this.cube.rotation.x += 0.01;
     this.cube.rotation.y += 0.01;
-    this.wgl.render(this.scene, this.camera);
+    this.webgl.render(this.scene, this.camera);
   }
 
-  public get_dom_element(): HTMLElement {
-    return this.wgl.domElement;
+  public getHTMLElement(): HTMLElement {
+    return this.webgl.domElement;
   }
 }
