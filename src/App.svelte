@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Counter from './lib/Counter.svelte';
-  import UserInterface from './lib/UserInterface.svelte';
-  import Viewport from './lib/Viewport.svelte';
+  import Counter from './components/Counter.svelte';
+  import UserInterface from './components/UserInterface.svelte';
+  import Viewport from './components/Viewport.svelte';
 </script>
 
 <main>
