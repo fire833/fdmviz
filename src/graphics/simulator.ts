@@ -1,3 +1,4 @@
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import {
   BoxGeometry,
   Color,
@@ -12,6 +13,7 @@ export default class Simulator {
   private scene: Scene;
   private webgl: WebGLRenderer;
   private camera: PerspectiveCamera;
+  private controls: OrbitControls;
 
   private cube: Mesh;
 
@@ -25,8 +27,11 @@ export default class Simulator {
       0.1,
       1000,
     );
+    
+    this.controls = new OrbitControls(this.camera, this.webgl.domElement);
 
     this.camera.position.z = 5;
+    this.controls.update();
     const geometry = new BoxGeometry(1, 1, 1);
     const material = new MeshBasicMaterial({ color: 0x00ff00 });
     this.cube = new Mesh(geometry, material);
@@ -36,9 +41,15 @@ export default class Simulator {
     this.webgl.setSize(window.innerWidth, window.innerHeight);
   }
 
-  public render() {
+  public updateScene() {
     this.cube.rotation.x += 0.01;
     this.cube.rotation.y += 0.01;
+    
+  }
+
+  public rerender() {
+    this.controls.update();
+    this.updateScene();
     this.webgl.render(this.scene, this.camera);
   }
 
@@ -47,6 +58,6 @@ export default class Simulator {
   }
   
   public setAnimationLoop() {
-    this.webgl.setAnimationLoop(() => {this.render()});
+    this.webgl.setAnimationLoop(() => {this.rerender()});
   }
 }

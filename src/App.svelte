@@ -28,5 +28,6 @@
     height: 100vh;
     z-index: 10;
     text-align: center;
+    pointer-events: none;
   }
 </style>
