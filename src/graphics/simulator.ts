@@ -39,25 +39,25 @@ export default class Simulator {
 
     // Default to full size of the window.
     this.webgl.setSize(window.innerWidth, window.innerHeight);
+
+    // Rerender the scene on every frame
+    this.webgl.setAnimationLoop(() => {this.rerender()});
   }
 
-  public updateScene() {
+  public update() {
+    // Update views based on controls (mouse)
+    this.controls.update();
+    // Animate cube
     this.cube.rotation.x += 0.01;
     this.cube.rotation.y += 0.01;
-    
   }
 
   public rerender() {
-    this.controls.update();
-    this.updateScene();
+    this.update();
     this.webgl.render(this.scene, this.camera);
   }
 
   public getHTMLElement(): HTMLElement {
     return this.webgl.domElement;
-  }
-  
-  public setAnimationLoop() {
-    this.webgl.setAnimationLoop(() => {this.rerender()});
   }
 }

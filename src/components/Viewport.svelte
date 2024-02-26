@@ -7,7 +7,6 @@
 
   onMount(() => {
     container.appendChild(sim.getHTMLElement());
-    sim.setAnimationLoop();
   });
 </script>
 
