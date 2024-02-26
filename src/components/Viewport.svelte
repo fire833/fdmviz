@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { PerspectiveCamera, Scene, WebGLRenderer } from 'three';
-  import Renderer from '../graphics/render';
+  import Renderer from '../graphics/renderer';
 
   let viewport: HTMLElement;
   let renderer = new Renderer();

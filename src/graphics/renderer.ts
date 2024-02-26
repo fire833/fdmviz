@@ -1,5 +1,6 @@
 import {
   BoxGeometry,
+  Color,
   Mesh,
   MeshBasicMaterial,
   PerspectiveCamera,
@@ -8,14 +9,15 @@ import {
 } from 'three';
 
 export default class Renderer {
-  scene: Scene;
-  wgl: WebGLRenderer;
-  camera: PerspectiveCamera;
+  private scene: Scene;
+  private wgl: WebGLRenderer;
+  private camera: PerspectiveCamera;
 
   private cube: Mesh;
 
   constructor() {
     this.scene = new Scene();
+    this.scene.background = new Color(0x303030);
     this.wgl = new WebGLRenderer();
     this.camera = new PerspectiveCamera(
       75,
