@@ -45,4 +45,8 @@ export default class Simulator {
   public getHTMLElement(): HTMLElement {
     return this.webgl.domElement;
   }
+  
+  public setAnimationLoop() {
+    this.webgl.setAnimationLoop(() => {this.render()});
+  }
 }

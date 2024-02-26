@@ -5,14 +5,9 @@
   let container: HTMLElement;
   let sim = new Simulator();
 
-  function animate() {
-    sim.render();
-    requestAnimationFrame(animate); // TODO: use setAnimationLoop to not use this recursively
-  }
-
   onMount(() => {
     container.appendChild(sim.getHTMLElement());
-    animate();
+    sim.setAnimationLoop();
   });
 </script>
 
