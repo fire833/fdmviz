@@ -10,7 +10,7 @@
     1000,
   );
 
-  let vp: HTMLElement;
+  let viewport: HTMLElement;
 
   const renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -30,9 +30,9 @@
   }
 
   onMount(() => {
-    vp.appendChild(renderer.domElement);
+    viewport.appendChild(renderer.domElement);
     animate();
   });
 </script>
 
-<div bind:this={vp}></div>
+<div bind:this={viewport}></div>
