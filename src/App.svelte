@@ -1,25 +1,32 @@
 <script lang="ts">
-  import svelteLogo from "./assets/svelte.svg";
-  import viteLogo from "/vite.svg";
-  import Counter from "./lib/Counter.svelte";
+  import Counter from './lib/Counter.svelte';
+  import UserInterface from './lib/UserInterface.svelte';
+  import Viewport from './lib/Viewport.svelte';
 </script>
 
-<main>Super cool CG app.</main>
+<main>
+  <div class="bg">
+    <Viewport></Viewport>
+  </div>
+  <div class="fg">
+    <UserInterface></UserInterface>
+  </div>
+</main>
 
 <style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
+  .bg {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    text-align: center;
   }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
+
+  .fg {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+    text-align: center;
   }
 </style>
