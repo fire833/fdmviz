@@ -4,10 +4,12 @@ import {
   Color,
   Mesh,
   MeshBasicMaterial,
+  MeshPhysicalMaterial,
   PerspectiveCamera,
   Scene,
   WebGLRenderer,
 } from 'three';
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 
 export default class Simulator {
   private webgl: WebGLRenderer;
@@ -15,7 +17,7 @@ export default class Simulator {
   private camera: PerspectiveCamera;
   private controls: OrbitControls;
 
-  private cube: Mesh;
+  private mesh: Mesh;
 
   constructor() {
     // Set up renderer
@@ -27,11 +29,36 @@ export default class Simulator {
     this.scene = new Scene();
     this.scene.background = new Color(0x323236);
 
-    // Add a placeholder cube to the scene
+    // Add a placeholder object to the scene
     const geometry = new BoxGeometry(1, 1, 1);
-    const material = new MeshBasicMaterial({ color: 0x00ffff });
-    this.cube = new Mesh(geometry, material);
-    this.scene.add(this.cube);
+    const material = new MeshPhysicalMaterial({
+        color: 0xb2ffc8,
+        metalness: 0.25,
+        roughness: 0.1,
+        opacity: 1.0,
+        transparent: true,
+        transmission: 0.99,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.25
+    })
+    this.mesh = new Mesh(geometry, material);
+
+    // Add STL
+    const loader = new STLLoader();
+    loader.load(
+        'benchy.stl',
+        (geometry) => {
+            geometry.rotateX(-Math.PI/2);
+            this.mesh = new Mesh(geometry, material);
+            this.scene.add(this.mesh);
+        },
+        (xhr) => {
+            console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+        },
+        (error) => {
+            console.log(error)
+        }
+    );
 
     // Set up camera
     this.camera = new PerspectiveCamera(
@@ -40,7 +67,8 @@ export default class Simulator {
       0.1,
       1000,
     );
-    this.camera.position.z = 5;
+    this.camera.position.z = 70;
+    this.camera.position.y = 40;
 
     // Add orbit controls for the mouse
     this.controls = new OrbitControls(this.camera, this.webgl.domElement);
