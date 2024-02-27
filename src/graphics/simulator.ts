@@ -3,7 +3,6 @@ import {
   BoxGeometry,
   Color,
   Mesh,
-  MeshBasicMaterial,
   MeshPhysicalMaterial,
   PerspectiveCamera,
   Scene,
@@ -32,7 +31,7 @@ export default class Simulator {
     // Add a placeholder object to the scene
     const geometry = new BoxGeometry(1, 1, 1);
     const material = new MeshPhysicalMaterial({
-        color: 0xb2ffc8,
+        color: 0x00ff00,
         metalness: 0.25,
         roughness: 0.1,
         opacity: 1.0,
@@ -67,8 +66,8 @@ export default class Simulator {
       0.1,
       1000,
     );
-    this.camera.position.z = 70;
-    this.camera.position.y = 40;
+    this.camera.position.z = 20;
+    this.camera.position.y = 10;
 
     // Add orbit controls for the mouse
     this.controls = new OrbitControls(this.camera, this.webgl.domElement);
