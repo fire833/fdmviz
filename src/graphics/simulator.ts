@@ -20,7 +20,7 @@ export default class Simulator {
 
   constructor() {
     // Set up renderer
-    this.webgl = new WebGLRenderer();
+    this.webgl = new WebGLRenderer({antialias: true});
     this.webgl.setSize(window.innerWidth, window.innerHeight); // Default to full size of the window.
     this.webgl.setAnimationLoop(() => {this.rerender()}); // Rerender the scene on every frame
         
