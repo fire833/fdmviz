@@ -29,13 +29,18 @@
     </div>
   </fieldset>
 
+  <fieldset class="grid">
+    <legend>Parameters</legend>
+
+    <input type="range" />
+    <div class="align">Sim Speed</div>
+    <input type="range" />
+    <div class="align">Layer Height</div>
+  </fieldset>
+
   <fieldset>
     <legend>Features</legend>
 
-    <div class="align">
-      Speed
-      <input type="range" />
-    </div>
     <div class="left">
       <input type="checkbox" id="melty" />
       <label for="melty">Melty Particles</label>
@@ -43,6 +48,10 @@
     <div class="left">
       <input type="checkbox" id="shaky" />
       <label for="shaky">Shaky Bed</label>
+    </div>
+    <div class="left">
+      <input type="checkbox" id="wet" />
+      <label for="wet">Wet Filament</label>
     </div>
     <div class="left">
       <input type="checkbox" id="transfer" />
@@ -88,9 +97,15 @@
     display: flex;
     justify-content: start;
     gap: 0.5rem;
+    grid-column: span 2;
   }
 
   legend {
     padding: 0 0.5rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
   }
 </style>
