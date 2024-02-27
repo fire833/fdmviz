@@ -32,10 +32,12 @@
   <fieldset class="grid">
     <legend>Parameters</legend>
 
-    <input type="range" />
     <div class="align">Sim Speed</div>
     <input type="range" />
     <div class="align">Layer Height</div>
+    <input type="range" />
+    <div class="align">Temperature</div>
+    <input type="range" />
   </fieldset>
 
   <fieldset>
@@ -77,9 +79,8 @@
   .align {
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: start;
     align-content: center;
-    gap: 1rem;
   }
 
   fieldset {
@@ -106,6 +107,6 @@
 
   .grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 2fr 3fr;
   }
 </style>
