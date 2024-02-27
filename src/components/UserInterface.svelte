@@ -1,16 +1,7 @@
-<div class="parent">
-  UI
-  <button
-    on:click={() => {
-      alert('Changing mode ;)');
-    }}
-  >
-    Change Mode
-  </button>
-</div>
+<script>
+  import Settings from './Settings.svelte';
+  import SelectModel from './SelectModel.svelte';
+</script>
 
-<style>
-  .parent > * {
-    pointer-events: auto;
-  }
-</style>
+<Settings></Settings>
+<SelectModel></SelectModel>

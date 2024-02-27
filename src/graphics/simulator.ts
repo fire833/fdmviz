@@ -25,7 +25,7 @@ export default class Simulator {
         
     // Set up scene
     this.scene = new Scene();
-    this.scene.background = new Color(0x303030);
+    this.scene.background = new Color(0x323236);
 
     // Add a placeholder cube to the scene
     const geometry = new BoxGeometry(1, 1, 1);
