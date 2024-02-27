@@ -46,7 +46,7 @@ export default class Simulator {
     // Add STL
     const loader = new STLLoader();
     loader.load(
-        'benchy.stl',
+        'utah_teapot.stl',
         (geometry) => {
             geometry.rotateX(-Math.PI/2);
             this.mesh = new Mesh(geometry, material);
