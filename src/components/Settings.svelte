@@ -1,5 +1,15 @@
+<script lang="ts">
+  let fileList: FileList;
+</script>
+
 <div class="container">
   <h1>Settings</h1>
+
+  <fieldset>
+    <legend>Upload Model</legend>
+    <input type="file" bind:files={fileList} />
+  </fieldset>
+
   <fieldset>
     <legend>View Mode</legend>
 
@@ -10,7 +20,7 @@
 
     <div class="left">
       <input type="radio" id="dewey" name="drone" value="dewey" />
-      <label for="dewey">Particle Sim</label>
+      <label for="dewey">Particle Simulation</label>
     </div>
 
     <div class="left">
@@ -64,7 +74,7 @@
   }
 
   fieldset {
-    padding: 1rem;
+    padding: 0.5rem 1rem 1rem 1rem;
     gap: 0.5rem;
     display: flex;
     flex-direction: column;
