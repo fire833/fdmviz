@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { temp } from 'three/examples/jsm/nodes/Nodes.js';
-  import { ViewMode } from '../stores';
+  import { ViewMode } from '../types';
 
-  let fileList: FileList;
+  let file: File;
   let viewMode: ViewMode = ViewMode.RAW_STL;
 
   let simSpeed: Number;
@@ -20,7 +19,7 @@
 
   <fieldset>
     <legend>Upload Model</legend>
-    <input type="file" bind:files={fileList} />
+    <input type="file" bind:value={file} accept=".stl" />
   </fieldset>
 
   <fieldset>

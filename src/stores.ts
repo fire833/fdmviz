@@ -1,10 +1,5 @@
 import { writable } from 'svelte/store';
-
-export enum ViewMode {
-    RAW_STL,
-    PARTICLE_SIM,
-    NORMAL_MAP
-}
+import { ViewMode } from './types';
 
 export const file = writable<File>();
 export const viewMode = writable<ViewMode>(ViewMode.RAW_STL);
