@@ -1,5 +1,18 @@
 <script lang="ts">
+  import { temp } from 'three/examples/jsm/nodes/Nodes.js';
+  import { ViewMode } from '../stores';
+
   let fileList: FileList;
+  let viewMode: ViewMode = ViewMode.RAW_STL;
+
+  let simSpeed: Number;
+  let layerHeight: Number;
+  let temperature: Number;
+
+  let meltyParticles: boolean = false;
+  let shakyBed: boolean = false;
+  let wetFilament: boolean = false;
+  let thermalTransfer: boolean = false;
 </script>
 
 <div class="container">
@@ -14,18 +27,36 @@
     <legend>View Mode</legend>
 
     <div class="left">
-      <input type="radio" id="huey" name="drone" value="huey" checked />
-      <label for="huey">Raw 3D File</label>
+      <input
+        type="radio"
+        id="raw"
+        name="viewMode"
+        value={ViewMode.RAW_STL}
+        bind:group={viewMode}
+      />
+      <label for="raw">Raw 3D File</label>
     </div>
 
     <div class="left">
-      <input type="radio" id="dewey" name="drone" value="dewey" />
-      <label for="dewey">Particle Simulation</label>
+      <input
+        type="radio"
+        id="particle"
+        name="viewMode"
+        value={ViewMode.PARTICLE_SIM}
+        bind:group={viewMode}
+      />
+      <label for="particle">Particle Simulation</label>
     </div>
 
     <div class="left">
-      <input type="radio" id="louie" name="drone" value="louie" />
-      <label for="louie">Normal Map</label>
+      <input
+        type="radio"
+        id="normal"
+        name="viewMode"
+        value={ViewMode.NORMAL_MAP}
+        bind:group={viewMode}
+      />
+      <label for="normal">Normal Map</label>
     </div>
   </fieldset>
 
@@ -33,30 +64,30 @@
     <legend>Parameters</legend>
 
     <div class="align">Sim Speed</div>
-    <input type="range" />
+    <input type="range" bind:value={simSpeed} />
     <div class="align">Layer Height</div>
-    <input type="range" />
+    <input type="range" bind:value={layerHeight} />
     <div class="align">Temperature</div>
-    <input type="range" />
+    <input type="range" bind:value={temperature} />
   </fieldset>
 
   <fieldset>
     <legend>Features</legend>
 
     <div class="left">
-      <input type="checkbox" id="melty" />
+      <input type="checkbox" id="melty" bind:checked={meltyParticles} />
       <label for="melty">Melty Particles</label>
     </div>
     <div class="left">
-      <input type="checkbox" id="shaky" />
+      <input type="checkbox" id="shaky" bind:checked={shakyBed} />
       <label for="shaky">Shaky Bed</label>
     </div>
     <div class="left">
-      <input type="checkbox" id="wet" />
+      <input type="checkbox" id="wet" bind:checked={wetFilament} />
       <label for="wet">Wet Filament</label>
     </div>
     <div class="left">
-      <input type="checkbox" id="transfer" />
+      <input type="checkbox" id="transfer" bind:checked={thermalTransfer} />
       <label for="transfer">Thermal Transfer</label>
     </div>
   </fieldset>
