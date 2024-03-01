@@ -1,13 +1,14 @@
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import {
-  BoxGeometry,
+  AmbientLight,
   Color,
+  DirectionalLight,
   Mesh,
-  MeshPhysicalMaterial,
+  MeshStandardMaterial,
   PerspectiveCamera,
   Scene,
   WebGLRenderer,
 } from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 
 export default class Simulator {
@@ -20,17 +21,30 @@ export default class Simulator {
 
   constructor() {
     // Set up renderer
-    this.webgl = new WebGLRenderer({antialias: true});
+    this.webgl = new WebGLRenderer({ antialias: true });
     this.webgl.setSize(window.innerWidth, window.innerHeight); // Default to full size of the window.
-    this.webgl.setAnimationLoop(() => {this.rerender()}); // Rerender the scene on every frame
-        
+    this.webgl.setAnimationLoop(() => {
+      this.rerender();
+    }); // Rerender the scene on every frame
+
     // Set up scene
     this.scene = new Scene();
     this.scene.background = new Color(0x323236);
 
-    // Set up meshes
+    // Add some lights
+    const ambientLight = new AmbientLight(0xffffff, 0.5);
+    this.scene.add(ambientLight);
+
+    const directLight = new DirectionalLight(0xffffff, 3);
+    directLight.position.set(5, 15, 35);
+    this.scene.add(directLight);
+
+    const directLight2 = new DirectionalLight(0xffffff, 3);
+    directLight2.position.set(5, -15, -35);
+    this.scene.add(directLight2);
+
+    // Add the mesh
     this.mesh = null; // Initialize this to null to appease TypeScript
-    this.updateMesh();
 
     // Set up camera
     this.camera = new PerspectiveCamera(
@@ -49,42 +63,37 @@ export default class Simulator {
 
   // Update the mesh being displayed based on a certain fileURL
   public updateMesh(fileURL: string = 'utah_teapot.stl') {
-
-    // Remove existing mesh
-    this.scene.clear();
+    // Remove existing
+    if (this.mesh != null) this.scene.remove(this.mesh);
 
     // Define the mesh material
-    const material = new MeshPhysicalMaterial({
-        color: 0x00ff00,
-        metalness: 0.25,
-        roughness: 0.1,
-        opacity: 1.0,
-        transparent: true,
-        transmission: 0.99,
-        clearcoat: 1.0,
-        clearcoatRoughness: 0.25
-    })
+    const material = new MeshStandardMaterial({
+      color: 0x4bcde9,
+      roughness: 0.5,
+    });
 
     // Load STL
     const loader = new STLLoader();
     loader.load(
       fileURL,
       (geometry) => {
-          geometry.rotateX(-Math.PI/2); // Change coordinate system from STL to 3js
-          this.mesh = new Mesh(geometry, material);
-          this.scene.add(this.mesh);
+        geometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
+        this.mesh = new Mesh(geometry, material);
+        this.scene.add(this.mesh);
       },
       (xhr) => {
-          console.log('Loading object: ' + (xhr.loaded / xhr.total) * 100 + '% loaded')
+        console.log(
+          'Loading object: ' + (xhr.loaded / xhr.total) * 100 + '% loaded',
+        );
       },
       (error) => {
-          console.log(error)
-      }
+        console.log(error);
+      },
     );
   }
 
   public update() {
-    // Update views based on controls (mouse)
+    // Update view based on controls (mouse)
     this.controls.update();
   }
 
