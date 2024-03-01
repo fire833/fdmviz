@@ -1,17 +1,27 @@
 <script lang="ts">
   import { ViewMode } from '../types';
+  import {
+    fileURL,
+    viewMode,
+    simSpeed,
+    layerHeight,
+    temperature,
+    meltyParticles,
+    shakyBed,
+    wetFilament,
+    thermalTransfer,
+  } from '../stores';
 
-  let file: File;
-  let viewMode: ViewMode = ViewMode.RAW_STL;
+  let files: FileList;
 
-  let simSpeed: Number;
-  let layerHeight: Number;
-  let temperature: Number;
-
-  let meltyParticles: boolean = false;
-  let shakyBed: boolean = false;
-  let wetFilament: boolean = false;
-  let thermalTransfer: boolean = false;
+  // Pull out first file in files and set the fileURL to it
+  $: if (files) {
+    let file: File | null;
+    file = files.item(0);
+    if (file != null) {
+      fileURL.set(URL.createObjectURL(file));
+    }
+  }
 </script>
 
 <div class="container">
@@ -19,7 +29,7 @@
 
   <fieldset>
     <legend>Upload Model</legend>
-    <input type="file" bind:value={file} accept=".stl" />
+    <input type="file" bind:files accept=".stl" />
   </fieldset>
 
   <fieldset>
@@ -31,7 +41,7 @@
         id="raw"
         name="viewMode"
         value={ViewMode.RAW_STL}
-        bind:group={viewMode}
+        bind:group={$viewMode}
       />
       <label for="raw">Raw 3D File</label>
     </div>
@@ -42,7 +52,7 @@
         id="particle"
         name="viewMode"
         value={ViewMode.PARTICLE_SIM}
-        bind:group={viewMode}
+        bind:group={$viewMode}
       />
       <label for="particle">Particle Simulation</label>
     </div>
@@ -53,7 +63,7 @@
         id="normal"
         name="viewMode"
         value={ViewMode.NORMAL_MAP}
-        bind:group={viewMode}
+        bind:group={$viewMode}
       />
       <label for="normal">Normal Map</label>
     </div>
@@ -62,31 +72,40 @@
   <fieldset class="grid">
     <legend>Parameters</legend>
 
-    <div class="align">Sim Speed</div>
-    <input type="range" bind:value={simSpeed} />
-    <div class="align">Layer Height</div>
-    <input type="range" bind:value={layerHeight} />
-    <div class="align">Temperature</div>
-    <input type="range" bind:value={temperature} />
+    <div class="align">
+      Sim Speed:
+      <div style="width: 3ch">{$simSpeed}</div>
+    </div>
+    <input type="range" bind:value={$simSpeed} />
+    <div class="align">
+      Layer Height:
+      <div style="width: 3ch">{$layerHeight}</div>
+    </div>
+    <input type="range" bind:value={$layerHeight} />
+    <div class="align">
+      Temperature:
+      <div style="width: 3ch">{$temperature}</div>
+    </div>
+    <input type="range" bind:value={$temperature} />
   </fieldset>
 
   <fieldset>
     <legend>Features</legend>
 
     <div class="left">
-      <input type="checkbox" id="melty" bind:checked={meltyParticles} />
+      <input type="checkbox" id="melty" bind:checked={$meltyParticles} />
       <label for="melty">Melty Particles</label>
     </div>
     <div class="left">
-      <input type="checkbox" id="shaky" bind:checked={shakyBed} />
+      <input type="checkbox" id="shaky" bind:checked={$shakyBed} />
       <label for="shaky">Shaky Bed</label>
     </div>
     <div class="left">
-      <input type="checkbox" id="wet" bind:checked={wetFilament} />
+      <input type="checkbox" id="wet" bind:checked={$wetFilament} />
       <label for="wet">Wet Filament</label>
     </div>
     <div class="left">
-      <input type="checkbox" id="transfer" bind:checked={thermalTransfer} />
+      <input type="checkbox" id="transfer" bind:checked={$thermalTransfer} />
       <label for="transfer">Thermal Transfer</label>
     </div>
   </fieldset>
