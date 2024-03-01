@@ -59,6 +59,8 @@ export default class Simulator {
     // Add orbit controls for the mouse
     this.controls = new OrbitControls(this.camera, this.webgl.domElement);
     this.controls.autoRotate = true;
+    this.controls.enableDamping = true;
+    this.controls.dampingFactor = 0.3;
   }
 
   // Update the mesh being displayed based on a certain fileURL
