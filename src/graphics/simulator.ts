@@ -16,7 +16,7 @@ export default class Simulator {
   private camera: PerspectiveCamera;
   private controls: OrbitControls;
 
-  private mesh: Mesh;
+  private mesh: Mesh | null;
 
   constructor() {
     // Set up renderer
@@ -28,36 +28,9 @@ export default class Simulator {
     this.scene = new Scene();
     this.scene.background = new Color(0x323236);
 
-    // Add a placeholder object to the scene
-    const geometry = new BoxGeometry(1, 1, 1);
-    const material = new MeshPhysicalMaterial({
-        color: 0x00ff00,
-        metalness: 0.25,
-        roughness: 0.1,
-        opacity: 1.0,
-        transparent: true,
-        transmission: 0.99,
-        clearcoat: 1.0,
-        clearcoatRoughness: 0.25
-    })
-    this.mesh = new Mesh(geometry, material);
-
-    // Add STL
-    const loader = new STLLoader();
-    loader.load(
-        'utah_teapot.stl',
-        (geometry) => {
-            geometry.rotateX(-Math.PI/2);
-            this.mesh = new Mesh(geometry, material);
-            this.scene.add(this.mesh);
-        },
-        (xhr) => {
-            console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
-        },
-        (error) => {
-            console.log(error)
-        }
-    );
+    // Set up meshes
+    this.mesh = null; // Initialize this to null to appease TypeScript
+    this.updateMesh();
 
     // Set up camera
     this.camera = new PerspectiveCamera(
@@ -72,6 +45,42 @@ export default class Simulator {
     // Add orbit controls for the mouse
     this.controls = new OrbitControls(this.camera, this.webgl.domElement);
     this.controls.autoRotate = true;
+  }
+
+  // Update the mesh being displayed based on a certain fileURL
+  public updateMesh(fileURL: string = 'utah_teapot.stl') {
+
+    // Remove existing mesh
+    this.scene.clear();
+
+    // Define the mesh material
+    const material = new MeshPhysicalMaterial({
+        color: 0x00ff00,
+        metalness: 0.25,
+        roughness: 0.1,
+        opacity: 1.0,
+        transparent: true,
+        transmission: 0.99,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.25
+    })
+
+    // Load STL
+    const loader = new STLLoader();
+    loader.load(
+      fileURL,
+      (geometry) => {
+          geometry.rotateX(-Math.PI/2); // Change coordinate system from STL to 3js
+          this.mesh = new Mesh(geometry, material);
+          this.scene.add(this.mesh);
+      },
+      (xhr) => {
+          console.log('Loading object: ' + (xhr.loaded / xhr.total) * 100 + '% loaded')
+      },
+      (error) => {
+          console.log(error)
+      }
+    );
   }
 
   public update() {
