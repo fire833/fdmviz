@@ -8,7 +8,7 @@
 
   // If the fileURL updates, update the sim's mesh
   fileURL.subscribe((value) => {
-    sim.updateMesh(value);
+    sim.uploadMesh(value);
   });
 
   onMount(() => {

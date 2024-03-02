@@ -43,8 +43,8 @@ export default class Simulator {
     directLight2.position.set(5, -15, -35);
     this.scene.add(directLight2);
 
-    // Add the mesh
-    this.mesh = null; // Initialize this to null to appease TypeScript
+    // Initialize the mesh to null to appease TypeScript
+    this.mesh = null;
 
     // Set up camera
     this.camera = new PerspectiveCamera(
@@ -63,8 +63,8 @@ export default class Simulator {
     this.controls.dampingFactor = 0.3;
   }
 
-  // Update the mesh being displayed based on a certain fileURL
-  public updateMesh(fileURL: string = 'utah_teapot.stl') {
+  // Upload the mesh being displayed based on a certain fileURL
+  public uploadMesh(fileURL: string = 'utah_teapot.stl') {
     // Remove existing
     if (this.mesh != null) this.scene.remove(this.mesh);
 
@@ -94,15 +94,13 @@ export default class Simulator {
     );
   }
 
-  public update() {
+  public updateScene() {
     // Update view based on controls (mouse)
     this.controls.update();
   }
 
   public rerender() {
-    // Update the scene
-    this.update();
-    // Render the frame
+    this.updateScene();
     this.webgl.render(this.scene, this.camera);
   }
 

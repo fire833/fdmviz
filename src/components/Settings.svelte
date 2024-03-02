@@ -27,13 +27,13 @@
 <div class="container">
   <h1>Settings</h1>
 
-  <fieldset>
-    <legend>Upload Model</legend>
+  <div class="section">
+    <h2>Upload Model</h2>
     <input type="file" bind:files accept=".stl" />
-  </fieldset>
+  </div>
 
-  <fieldset>
-    <legend>View Mode</legend>
+  <div class="section">
+    <h2>View Mode</h2>
 
     <div class="left">
       <input
@@ -67,30 +67,41 @@
       />
       <label for="normal">Normal Map</label>
     </div>
-  </fieldset>
+  </div>
 
-  <fieldset class="grid">
-    <legend>Parameters</legend>
+  <div class="section">
+    <h2>Parameters</h2>
 
-    <div class="align">
-      Sim Speed:
-      <div style="width: 3ch">{$simSpeed}</div>
+    <div class="grid">
+      <div class="align">Sim Speed (TPS)</div>
+      <input
+        type="number"
+        bind:value={$simSpeed}
+        min="0.25"
+        max="4.0"
+        step="0.25"
+      />
+      <div class="align">Layer Height (mm)</div>
+      <input
+        type="number"
+        bind:value={$layerHeight}
+        min="0.05"
+        max="1"
+        step="0.05"
+      />
+      <div class="align">Temperature (°C)</div>
+      <input
+        type="number"
+        bind:value={$temperature}
+        min="100"
+        max="400"
+        step="10"
+      />
     </div>
-    <input type="range" bind:value={$simSpeed} />
-    <div class="align">
-      Layer Height:
-      <div style="width: 3ch">{$layerHeight}</div>
-    </div>
-    <input type="range" bind:value={$layerHeight} />
-    <div class="align">
-      Temperature:
-      <div style="width: 3ch">{$temperature}</div>
-    </div>
-    <input type="range" bind:value={$temperature} />
-  </fieldset>
+  </div>
 
-  <fieldset>
-    <legend>Features</legend>
+  <div class="section">
+    <h2>Features</h2>
 
     <div class="left">
       <input type="checkbox" id="melty" bind:checked={$meltyParticles} />
@@ -108,7 +119,7 @@
       <input type="checkbox" id="transfer" bind:checked={$thermalTransfer} />
       <label for="transfer">Thermal Transfer</label>
     </div>
-  </fieldset>
+  </div>
 </div>
 
 <style>
@@ -128,11 +139,11 @@
   .align {
     display: flex;
     flex-direction: row;
-    justify-content: start;
+    justify-content: space-between;
     align-content: center;
   }
 
-  fieldset {
+  .section {
     padding: 0.5rem 1rem 1rem 1rem;
     gap: 0.5rem;
     display: flex;
@@ -150,12 +161,17 @@
     grid-column: span 2;
   }
 
-  legend {
-    padding: 0 0.5rem;
+  h1 {
+    font-size: 1.2em;
+  }
+  h2 {
+    font-weight: 500;
+    margin-bottom: 0.2rem;
   }
 
   .grid {
     display: grid;
-    grid-template-columns: 2fr 3fr;
+    grid-template-columns: 2fr 7ch;
+    gap: 0.2rem 1rem;
   }
 </style>
