@@ -6,6 +6,7 @@ import {
   MeshStandardMaterial,
   PerspectiveCamera,
   Scene,
+  Sphere,
   Vector3,
   WebGLRenderer,
 } from 'three';
@@ -100,14 +101,15 @@ export default class Simulator {
     let center = new Vector3();
     boundingBox.getCenter(center);
 
-    // Calculate the size of the bounding box
-    const size = new Vector3();
-    boundingBox.getSize(size);
+    // Calculate the radius away the camera should be
+    const sphere = new Sphere();
+    boundingBox.getBoundingSphere(sphere);
 
-    // Center the camera's orbit there
+    // Center the camera's orbit and initial position
     this.controls.target.copy(center);
-    this.camera.position.y = size.y;
-    this.camera.position.z = Math.max(size.x, size.z);
+    this.camera.position.x = center.x; // Aligned with front of object
+    this.camera.position.y = center.y + sphere.radius; // At the top of the object
+    this.camera.position.z = center.z + sphere.radius * 2; // 2 radius's back
   }
 
   public updateScene() {
