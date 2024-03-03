@@ -1,10 +1,12 @@
 import {
   AmbientLight,
+  Box3,
   DirectionalLight,
   Mesh,
   MeshStandardMaterial,
   PerspectiveCamera,
   Scene,
+  Vector3,
   WebGLRenderer,
 } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -16,7 +18,7 @@ export default class Simulator {
   private camera: PerspectiveCamera;
   private controls: OrbitControls;
 
-  private mesh: Mesh | null;
+  private mesh: Mesh;
 
   constructor() {
     // Set up renderer
@@ -41,8 +43,8 @@ export default class Simulator {
     directLight2.position.set(5, -15, -35);
     this.scene.add(directLight2);
 
-    // Initialize the mesh to null to appease TypeScript
-    this.mesh = null;
+    // Initialize the mesh to an empty mesh
+    this.mesh = new Mesh();
 
     // Set up camera
     this.camera = new PerspectiveCamera(
@@ -51,8 +53,6 @@ export default class Simulator {
       0.1,
       1000,
     );
-    this.camera.position.z = 20;
-    this.camera.position.y = 10;
 
     // Add orbit controls for the mouse
     this.controls = new OrbitControls(this.camera, this.webgl.domElement);
@@ -63,8 +63,8 @@ export default class Simulator {
 
   // Upload the mesh being displayed based on a certain fileURL
   public uploadMesh(fileURL: string = 'utah_teapot.stl') {
-    // Remove existing
-    if (this.mesh != null) this.scene.remove(this.mesh);
+    // Remove previous mesh
+    this.scene.remove(this.mesh);
 
     // Define the mesh material
     const material = new MeshStandardMaterial({
@@ -80,6 +80,7 @@ export default class Simulator {
         geometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
         this.mesh = new Mesh(geometry, material);
         this.scene.add(this.mesh);
+        this.rescaleCamera();
       },
       (xhr) => {
         console.log(
@@ -90,6 +91,23 @@ export default class Simulator {
         console.log(error);
       },
     );
+  }
+
+  // Rescale the camera to fit and be centered on the current mesh
+  public rescaleCamera() {
+    // Get the center of the bounding box
+    let boundingBox = new Box3().setFromObject(this.mesh);
+    let center = new Vector3();
+    boundingBox.getCenter(center);
+
+    // Calculate the size of the bounding box
+    const size = new Vector3();
+    boundingBox.getSize(size);
+
+    // Center the camera's orbit there
+    this.controls.target.copy(center);
+    this.camera.position.y = size.y;
+    this.camera.position.z = Math.max(size.x, size.z);
   }
 
   public updateScene() {
