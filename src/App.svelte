@@ -28,5 +28,6 @@
     z-index: 10;
     text-align: center;
     pointer-events: none;
+    display: flex;
   }
 </style>

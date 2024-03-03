@@ -1,6 +1,5 @@
 import {
   AmbientLight,
-  Color,
   DirectionalLight,
   Mesh,
   MeshStandardMaterial,
@@ -21,7 +20,7 @@ export default class Simulator {
 
   constructor() {
     // Set up renderer
-    this.webgl = new WebGLRenderer({ antialias: true });
+    this.webgl = new WebGLRenderer({ antialias: true, alpha: true });
     this.webgl.setSize(window.innerWidth, window.innerHeight); // Default to full size of the window.
     this.webgl.setAnimationLoop(() => {
       this.rerender();
@@ -29,17 +28,16 @@ export default class Simulator {
 
     // Set up scene
     this.scene = new Scene();
-    this.scene.background = new Color(0x323236);
 
     // Add some lights
     const ambientLight = new AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
 
-    const directLight = new DirectionalLight(0xffffff, 3);
+    const directLight = new DirectionalLight('hsl(194, 70%, 90%)', 3);
     directLight.position.set(5, 15, 35);
     this.scene.add(directLight);
 
-    const directLight2 = new DirectionalLight(0xffffff, 3);
+    const directLight2 = new DirectionalLight('hsl(194, 40%, 60%)', 3);
     directLight2.position.set(5, -15, -35);
     this.scene.add(directLight2);
 
@@ -70,7 +68,7 @@ export default class Simulator {
 
     // Define the mesh material
     const material = new MeshStandardMaterial({
-      color: 0x4bcde9,
+      color: 'hsl(153, 60%, 71%)',
       roughness: 0.5,
     });
 

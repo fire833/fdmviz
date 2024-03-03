@@ -124,14 +124,14 @@
 
 <style>
   .container {
-    position: absolute;
     padding: 1rem;
-    margin-top: 4rem;
+    margin: auto 0;
 
     display: flex;
     flex-direction: column;
     pointer-events: auto;
-    background-color: #44444b;
+    background-color: var(--ui-color);
+    border-radius: 0 6px 6px 0;
 
     gap: 1rem;
   }
@@ -149,9 +149,10 @@
     display: flex;
     flex-direction: column;
 
-    border-color: #fff;
+    border-color: var(--color-blue-pale);
     border-style: solid;
     border-width: 1.5px;
+    border-radius: 4px;
   }
 
   .left {
@@ -163,6 +164,7 @@
 
   h1 {
     font-size: 1.2em;
+    color: var(--color-blue-pale);
   }
   h2 {
     font-weight: 500;

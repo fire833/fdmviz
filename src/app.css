@@ -3,16 +3,20 @@
   padding: 0;
   font: inherit;
 
-  --color-light-blue: #61a8df;
-  --color-teal-blue: #80e3ef;
-  --color-electric-blue: #4bcde9;
-  --color-dark-blue: #19469b;
-  --color-lime-green: #9dffb8;
-  --color-mint-green: #6efdef;
+  --color-bone: #DDD8C4;
+  --color-black-bone: hsl(229, 15%, 10%);
+  --color-dark-bone: hsl(229, 15%, 16%);
+  --color-green: #84B59F;
+  --color-dark-green: hsl(153, 40%, 61%);
+  --color-blue: hsl(194, 28%, 44%);
+  --color-blue-pale: hsl(194, 28%, 70%);
+
+  --background-color: var(--color-black-bone);
+  --ui-color: var(--color-dark-bone);
 }
 
 :root {
-  font-family: "Red Hat Mono", monospace;
-  background-color: #323236;
+  font-family: "Fira Sans", sans-serif;
+  background-color: var(--background-color);
   color: white;
 }
