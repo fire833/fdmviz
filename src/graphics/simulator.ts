@@ -13,7 +13,7 @@ import {
   WebGLRenderer,
 } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { VertexNormalsHelper } from 'three/examples/jsm/Addons.js';
+import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 
 export default class Simulator {
@@ -66,6 +66,11 @@ export default class Simulator {
     this.controls.dampingFactor = 0.3;
   }
 
+  public setVertexNormals(show: boolean) {
+    let normals = this.object.getObjectByName('normals');
+    if (normals) normals.visible = show;
+  }
+
   public populateObject(geometry: BufferGeometry) {
     // Define the mesh material
     const MATERIAL = new MeshStandardMaterial({
@@ -75,12 +80,12 @@ export default class Simulator {
 
     geometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
     let mesh = new Mesh(geometry, MATERIAL);
-    let normals = new VertexNormalsHelper(mesh, 1, 0xff0000);
-    let showNormals = true;
+    let normals = new VertexNormalsHelper(mesh, 1, 0xa4036f);
+    mesh.name = 'mesh';
+    normals.name = 'normals';
     this.object.add(mesh);
-    if (showNormals) {
-      this.object.add(normals);
-    }
+    this.object.add(normals);
+    this.setVertexNormals(false);
     this.rescaleCamera(mesh);
   }
 

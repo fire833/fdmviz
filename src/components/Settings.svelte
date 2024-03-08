@@ -6,6 +6,7 @@
     simSpeed,
     layerHeight,
     temperature,
+    showVertexNormals,
     meltyParticles,
     shakyBed,
     wetFilament,
@@ -103,6 +104,10 @@
   <div class="section">
     <h2>Features</h2>
 
+    <div class="left">
+      <input type="checkbox" id="melty" bind:checked={$showVertexNormals} />
+      <label for="melty">Show Vertex Normals</label>
+    </div>
     <div class="left">
       <input type="checkbox" id="melty" bind:checked={$meltyParticles} />
       <label for="melty">Melty Particles</label>
