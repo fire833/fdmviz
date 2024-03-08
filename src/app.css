@@ -15,7 +15,7 @@
   --ui-color: var(--color-dark-bone);
 }
 
-:root {
+:root { 
   font-family: "Fira Sans", sans-serif;
   background-color: var(--background-color);
   color: white;

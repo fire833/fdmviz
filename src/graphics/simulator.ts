@@ -1,7 +1,9 @@
 import {
   AmbientLight,
   Box3,
+  BufferGeometry,
   DirectionalLight,
+  Group,
   Mesh,
   MeshStandardMaterial,
   PerspectiveCamera,
@@ -11,6 +13,7 @@ import {
   WebGLRenderer,
 } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { VertexNormalsHelper } from 'three/examples/jsm/Addons.js';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 
 export default class Simulator {
@@ -19,7 +22,7 @@ export default class Simulator {
   private camera: PerspectiveCamera;
   private controls: OrbitControls;
 
-  private mesh: Mesh;
+  private object: Group; // Holds the mesh
 
   constructor() {
     // Set up renderer
@@ -44,8 +47,9 @@ export default class Simulator {
     directLight2.position.set(5, -15, -35);
     this.scene.add(directLight2);
 
-    // Initialize the mesh to an empty mesh
-    this.mesh = new Mesh();
+    // Initialize the group containing the mesh
+    this.object = new Group();
+    this.scene.add(this.object);
 
     // Set up camera
     this.camera = new PerspectiveCamera(
@@ -62,26 +66,35 @@ export default class Simulator {
     this.controls.dampingFactor = 0.3;
   }
 
-  // Upload the mesh being displayed based on a certain fileURL
-  public uploadMesh(fileURL: string = 'utah_teapot.stl') {
-    // Remove previous mesh
-    this.scene.remove(this.mesh);
-
+  public populateObject(geometry: BufferGeometry) {
     // Define the mesh material
-    const material = new MeshStandardMaterial({
+    const MATERIAL = new MeshStandardMaterial({
       color: 'hsl(153, 60%, 71%)',
       roughness: 0.5,
     });
+
+    geometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
+    let mesh = new Mesh(geometry, MATERIAL);
+    let normals = new VertexNormalsHelper(mesh, 1, 0xff0000);
+    let showNormals = true;
+    this.object.add(mesh);
+    if (showNormals) {
+      this.object.add(normals);
+    }
+    this.rescaleCamera(mesh);
+  }
+
+  // Upload the mesh being displayed based on a certain fileURL
+  public uploadMesh(fileURL: string = 'utah_teapot.stl') {
+    // Remove previous mesh
+    this.object.clear();
 
     // Load STL
     const loader = new STLLoader();
     loader.load(
       fileURL,
-      (geometry) => {
-        geometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
-        this.mesh = new Mesh(geometry, material);
-        this.scene.add(this.mesh);
-        this.rescaleCamera();
+      (geometry: BufferGeometry) => {
+        this.populateObject(geometry);
       },
       (xhr) => {
         console.log(
@@ -94,10 +107,10 @@ export default class Simulator {
     );
   }
 
-  // Rescale the camera to fit and be centered on the current mesh
-  public rescaleCamera() {
+  // Rescale the camera to fit and be centered on the mesh
+  public rescaleCamera(mesh: Mesh) {
     // Get the center of the bounding box
-    let boundingBox = new Box3().setFromObject(this.mesh);
+    let boundingBox = new Box3().setFromObject(mesh);
     let center = new Vector3();
     boundingBox.getCenter(center);
 
