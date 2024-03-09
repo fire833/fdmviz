@@ -123,7 +123,6 @@
         type="checkbox"
         id="surfaceNormals"
         bind:checked={$showSurfaceNormals}
-        disabled
       />
       <label for="surfaceNormals">Show Surface Normals</label>
     </div>

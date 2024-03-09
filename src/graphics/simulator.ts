@@ -1,3 +1,4 @@
+import { get } from 'svelte/store';
 import {
   AmbientLight,
   Box3,
@@ -5,6 +6,7 @@ import {
   DirectionalLight,
   Group,
   Mesh,
+  MeshNormalMaterial,
   MeshStandardMaterial,
   PerspectiveCamera,
   Scene,
@@ -15,6 +17,7 @@ import {
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
+import { showSurfaceNormals, showVertexNormals } from '../stores';
 
 export default class Simulator {
   private webgl: WebGLRenderer;
@@ -29,7 +32,7 @@ export default class Simulator {
     this.webgl = new WebGLRenderer({ antialias: true, alpha: true });
     this.webgl.setSize(window.innerWidth, window.innerHeight); // Default to full size of the window.
     this.webgl.setAnimationLoop(() => {
-      this.rerender();
+      this.render();
     }); // Rerender the scene on every frame
 
     // Set up scene
@@ -71,21 +74,32 @@ export default class Simulator {
     if (normals) normals.visible = show;
   }
 
-  public populateObject(geometry: BufferGeometry) {
-    // Define the mesh material
-    const MATERIAL = new MeshStandardMaterial({
-      color: 'hsl(153, 60%, 71%)',
-      roughness: 0.5,
-    });
+  public setMeshMaterial(show: boolean) {
+    let mesh = this.object.getObjectByName('mesh');
+    if (mesh! instanceof Mesh) {
+      if (show) {
+        // Show normal map material
+        mesh.material = new MeshNormalMaterial();
+      } else {
+        // Show standard material
+        mesh.material = new MeshStandardMaterial({
+          color: 'hsl(153, 60%, 71%)',
+          roughness: 0.5,
+        });
+      }
+    }
+  }
 
+  public populateObject(geometry: BufferGeometry) {
     geometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
-    let mesh = new Mesh(geometry, MATERIAL);
+    let mesh = new Mesh(geometry, undefined);
     let normals = new VertexNormalsHelper(mesh, 1, 0xa4036f);
     mesh.name = 'mesh';
     normals.name = 'normals';
     this.object.add(mesh);
     this.object.add(normals);
-    this.setVertexNormals(false);
+    this.setVertexNormals(get(showVertexNormals));
+    this.setMeshMaterial(get(showSurfaceNormals));
     this.rescaleCamera(mesh);
   }
 
@@ -135,7 +149,7 @@ export default class Simulator {
     this.controls.update();
   }
 
-  public rerender() {
+  public render() {
     this.updateScene();
     this.webgl.render(this.scene, this.camera);
   }

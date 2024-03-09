@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import Simulator from '../graphics/simulator';
-  import { fileURL, showVertexNormals } from '../stores';
+  import { fileURL, showVertexNormals, showSurfaceNormals } from '../stores';
 
   let container: HTMLElement;
   let sim = new Simulator();
@@ -13,6 +13,10 @@
 
   showVertexNormals.subscribe((value) => {
     sim.setVertexNormals(value);
+  });
+
+  showSurfaceNormals.subscribe((value) => {
+    sim.setMeshMaterial(value);
   });
 
   onMount(() => {
