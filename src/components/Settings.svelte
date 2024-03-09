@@ -11,6 +11,7 @@
     shakyBed,
     wetFilament,
     thermalTransfer,
+    showSurfaceNormals,
   } from '../stores';
 
   let files: FileList;
@@ -34,7 +35,7 @@
   </div>
 
   <div class="section">
-    <h2>View Mode</h2>
+    <h2>Visualizer Mode</h2>
 
     <div class="left">
       <input
@@ -54,6 +55,7 @@
         name="viewMode"
         value={ViewMode.PARTICLE_SIM}
         bind:group={$viewMode}
+        disabled
       />
       <label for="particle">Particle Simulation</label>
     </div>
@@ -65,6 +67,7 @@
         name="viewMode"
         value={ViewMode.NORMAL_MAP}
         bind:group={$viewMode}
+        disabled
       />
       <label for="normal">Normal Map</label>
     </div>
@@ -81,6 +84,7 @@
         min="0.25"
         max="4.0"
         step="0.25"
+        disabled
       />
       <div class="align">Layer Height (mm)</div>
       <input
@@ -89,6 +93,7 @@
         min="0.05"
         max="1"
         step="0.05"
+        disabled
       />
       <div class="align">Temperature (°C)</div>
       <input
@@ -97,6 +102,7 @@
         min="100"
         max="400"
         step="10"
+        disabled
       />
     </div>
   </div>
@@ -105,23 +111,46 @@
     <h2>Features</h2>
 
     <div class="left">
-      <input type="checkbox" id="melty" bind:checked={$showVertexNormals} />
-      <label for="melty">Show Vertex Normals</label>
+      <input
+        type="checkbox"
+        id="vertexNormals"
+        bind:checked={$showVertexNormals}
+      />
+      <label for="vertexNormals">Show Vertex Normals</label>
     </div>
     <div class="left">
-      <input type="checkbox" id="melty" bind:checked={$meltyParticles} />
+      <input
+        type="checkbox"
+        id="surfaceNormals"
+        bind:checked={$showSurfaceNormals}
+        disabled
+      />
+      <label for="surfaceNormals">Show Surface Normals</label>
+    </div>
+    <div class="left">
+      <input
+        type="checkbox"
+        id="melty"
+        bind:checked={$meltyParticles}
+        disabled
+      />
       <label for="melty">Melty Particles</label>
     </div>
     <div class="left">
-      <input type="checkbox" id="shaky" bind:checked={$shakyBed} />
+      <input type="checkbox" id="shaky" bind:checked={$shakyBed} disabled />
       <label for="shaky">Shaky Bed</label>
     </div>
     <div class="left">
-      <input type="checkbox" id="wet" bind:checked={$wetFilament} />
+      <input type="checkbox" id="wet" bind:checked={$wetFilament} disabled />
       <label for="wet">Wet Filament</label>
     </div>
     <div class="left">
-      <input type="checkbox" id="transfer" bind:checked={$thermalTransfer} />
+      <input
+        type="checkbox"
+        id="transfer"
+        bind:checked={$thermalTransfer}
+        disabled
+      />
       <label for="transfer">Thermal Transfer</label>
     </div>
   </div>
