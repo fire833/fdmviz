@@ -4,6 +4,7 @@ export enum ViewMode {
   NORMAL_MAP,
 }
 
+// TODO: Unused interface
 interface SettingsValues {
   viewMode: ViewMode;
   simSpeed: Number;
