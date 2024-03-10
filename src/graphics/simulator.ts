@@ -104,6 +104,8 @@ export default class Simulator {
   }
 
   // Upload the mesh being displayed based on a certain fileURL
+  //
+  // utah_teapot.stl
   public uploadMesh(fileURL: string = 'utah_teapot.stl') {
     // Remove previous mesh
     this.object.clear();

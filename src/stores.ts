@@ -1,6 +1,8 @@
 import { writable } from 'svelte/store';
 import { ViewMode } from './types';
 
+export const openModal = writable<boolean>(false);
+
 export const fileURL = writable<string>();
 export const viewMode = writable<ViewMode>(ViewMode.RAW_STL);
 // Parameters

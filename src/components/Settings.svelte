@@ -1,7 +1,6 @@
 <script lang="ts">
   import { ViewMode } from '../types';
   import {
-    fileURL,
     viewMode,
     simSpeed,
     layerHeight,
@@ -12,27 +11,13 @@
     wetFilament,
     thermalTransfer,
     showSurfaceNormals,
+    openModal,
   } from '../stores';
-
-  let files: FileList;
-
-  // Pull out first file in files and set the fileURL to it
-  $: if (files) {
-    let file: File | null;
-    file = files.item(0);
-    if (file != null) {
-      fileURL.set(URL.createObjectURL(file));
-    }
-  }
 </script>
 
-<div class="container">
+<div class="ui">
   <h1>Settings</h1>
-
-  <div class="section">
-    <h2>Upload Model</h2>
-    <input type="file" bind:files accept=".stl" />
-  </div>
+  <button on:click={() => openModal.set(true)}><h2>Pick Model</h2></button>
 
   <div class="section">
     <h2>Visualizer Mode</h2>
@@ -156,14 +141,11 @@
 </div>
 
 <style>
-  .container {
-    padding: 1rem;
+  .ui {
     margin: auto 0;
 
     display: flex;
     flex-direction: column;
-    pointer-events: auto;
-    background-color: var(--ui-color);
     border-radius: 0 6px 6px 0;
 
     gap: 1rem;
@@ -181,11 +163,6 @@
     gap: 0.5rem;
     display: flex;
     flex-direction: column;
-
-    border-color: var(--color-blue-pale);
-    border-style: solid;
-    border-width: 1.5px;
-    border-radius: 4px;
   }
 
   .left {
@@ -193,15 +170,6 @@
     justify-content: start;
     gap: 0.5rem;
     grid-column: span 2;
-  }
-
-  h1 {
-    font-size: 1.2em;
-    color: var(--color-blue-pale);
-  }
-  h2 {
-    font-weight: 500;
-    margin-bottom: 0.2rem;
   }
 
   .grid {

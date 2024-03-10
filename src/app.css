@@ -20,3 +20,29 @@
   background-color: var(--background-color);
   color: white;
 }
+
+.ui { /* A UI element */ 
+  pointer-events: auto;
+  background-color: var(--ui-color);
+  padding: 1rem;
+  border-radius: 6px;
+}
+
+.section {
+  padding: 1rem;
+
+  border-color: var(--color-blue-pale);
+  border-style: solid;
+  border-width: 1.5px;
+  border-radius: 4px;
+}
+
+h1 {
+  font-size: 1.2em;
+  color: var(--color-blue-pale);
+}
+
+h2 {
+  font-weight: 500;
+  margin-bottom: 0.2rem;
+}
