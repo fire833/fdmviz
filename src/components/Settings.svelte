@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
   import { ViewMode } from '../types';
   import {
     viewMode,
@@ -11,13 +12,16 @@
     wetFilament,
     thermalTransfer,
     showSurfaceNormals,
-    openModal,
   } from '../stores';
+
+  const dispatchModalEvent = createEventDispatcher();
 </script>
 
 <div class="ui">
   <h1>Settings</h1>
-  <button on:click={() => openModal.set(true)}>Pick Model</button>
+  <button on:click={() => dispatchModalEvent('openModal', {})}
+    >Pick Model</button
+  >
 
   <div class="section">
     <h2>Visualizer Mode</h2>

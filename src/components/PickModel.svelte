@@ -28,7 +28,7 @@
 
   function updateModel(url: string) {
     fileURL.set(url); // Set the URL
-    openModal.set(false); // Close modal
+    dialog.close(); // Close modal
   }
 
   let fileUploads: FileList;
@@ -40,9 +40,14 @@
       updateModel(URL.createObjectURL(file));
     }
   }
+
+  let dialog: HTMLDialogElement;
+  export function showModal() {
+    dialog.showModal();
+  }
 </script>
 
-{#if $openModal}
+<dialog bind:this={dialog}>
   <div class="ui">
     <h1>Select Your STL Model</h1>
     <div class="modes">
@@ -87,18 +92,26 @@
       </div>
     {/if}
   </div>
-{/if}
+</dialog>
 
 <style>
-  .ui::backdrop {
-    background-color: blue;
+  dialog::backdrop {
+    /* A bit darker and blurred */
+    background-color: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
   }
 
-  .ui {
-    position: absolute;
+  dialog {
+    border: none;
+    background: none;
+    color: inherit;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+  }
+
+  .ui {
+    margin: auto;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -115,6 +128,7 @@
     align-content: center;
     justify-content: center;
     padding: 3rem;
+    min-height: 16rem;
   }
 
   p {
