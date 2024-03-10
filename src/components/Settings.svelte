@@ -19,9 +19,9 @@
 
 <div class="ui">
   <h1>Settings</h1>
-  <button on:click={() => dispatchModalEvent('openModal', {})}
-    >Pick Model</button
-  >
+  <button on:click={() => dispatchModalEvent('openModal', {})}>
+    Choose Model
+  </button>
 
   <div class="section">
     <h2>Visualizer Mode</h2>

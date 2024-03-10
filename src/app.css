@@ -47,7 +47,8 @@ h2 {
   margin-bottom: 0.2rem;
 }
 
-button {
+button, 
+.button {
   color: inherit;
   background-color: rgba(255,255,255,0.1); /* Lighter */
   border-color: var(--color-blue-pale);
@@ -58,8 +59,20 @@ button {
   padding: 0.4em 0.4em;
 
   transition: 0.2s ease-in-out;
+
+  cursor:pointer;
 }
 
-button:hover {
+button:hover, .button:hover {
   background-color: rgba(255,255,255,0.2); /* Lighter */
+}
+
+input[type='text'] {
+  padding: 4px;
+  width: 40ch;
+  
+  border-color: var(--color-blue-pale);
+  border-style: solid;
+  border-width: 1.5px;
+  border-radius: 4px;
 }

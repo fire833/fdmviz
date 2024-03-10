@@ -31,6 +31,7 @@
     dialog.close(); // Close modal
   }
 
+  let fileButton: HTMLInputElement;
   let fileUploads: FileList;
   // Pull out first file in files and set the fileURL to it
   $: if (fileUploads) {
@@ -49,7 +50,7 @@
 
 <dialog bind:this={dialog}>
   <div class="ui">
-    <h1>Select Your STL Model</h1>
+    <h1>Choose an STL Model</h1>
     <div class="modes">
       <button
         on:click={() => {
@@ -81,7 +82,13 @@
     {:else if mode == Mode.Upload}
       <div class="section">
         <p>Upload an STL model</p>
-        <input type="file" bind:files={fileUploads} accept=".stl" />
+        <button on:click={() => fileButton.click()}>Pick file</button>
+        <input
+          type="file"
+          bind:this={fileButton}
+          bind:files={fileUploads}
+          accept=".stl"
+        />
       </div>
     {:else}
       <div class="section">
@@ -95,12 +102,6 @@
 </dialog>
 
 <style>
-  dialog::backdrop {
-    /* A bit darker and blurred */
-    background-color: rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
-  }
-
   dialog {
     border: none;
     background: none;
@@ -110,8 +111,13 @@
     transform: translate(-50%, -50%);
   }
 
+  dialog::backdrop {
+    /* A bit darker and blurred */
+    background-color: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+  }
+
   .ui {
-    margin: auto;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -140,5 +146,9 @@
     align-content: center;
     justify-content: center;
     gap: 0.5rem;
+  }
+
+  input[type='file'] {
+    display: none;
   }
 </style>
