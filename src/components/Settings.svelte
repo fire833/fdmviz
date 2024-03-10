@@ -17,7 +17,7 @@
 
 <div class="ui">
   <h1>Settings</h1>
-  <button on:click={() => openModal.set(true)}><h2>Pick Model</h2></button>
+  <button on:click={() => openModal.set(true)}>Pick Model</button>
 
   <div class="section">
     <h2>Visualizer Mode</h2>

@@ -9,7 +9,7 @@
   let mode: Mode = Mode.Preset;
 
   let presets: Map<string, string> = new Map([
-    ['Utah Teapot', 'utah_teapot.stl'],
+    ['Utah Teapot', 'utah_teapot.stl'], // Default, local
     [
       '3DBenchy',
       'https://raw.githubusercontent.com/CreativeTools/3DBenchy/master/Single-part/3DBenchy.stl',
@@ -49,17 +49,17 @@
       <button
         on:click={() => {
           mode = Mode.Preset;
-        }}><h2>Preset</h2></button
+        }}>Preset</button
       >
       <button
         on:click={() => {
           mode = Mode.Upload;
-        }}><h2>Upload</h2></button
+        }}>Upload</button
       >
       <button
         on:click={() => {
           mode = Mode.URL;
-        }}><h2>URL</h2></button
+        }}>URL</button
       >
     </div>
     {#if mode == Mode.Preset}
@@ -126,9 +126,5 @@
     align-content: center;
     justify-content: center;
     gap: 0.5rem;
-  }
-
-  button {
-    padding: 0.2em 0.4em;
   }
 </style>
