@@ -55,7 +55,7 @@ export default class Simulator {
 
     // Set up camera
     this.camera = new PerspectiveCamera(
-      75,
+      60,
       window.innerWidth / window.innerHeight,
       0.1,
       1000,
@@ -139,8 +139,8 @@ export default class Simulator {
     // Center the camera's orbit and initial position on the circle
     this.controls.target.copy(center);
     this.camera.position.x = center.x; // Aligned with front of object
-    this.camera.position.y = center.y + sphere.radius * 0.7; // At the top of the object
-    this.camera.position.z = center.z + sphere.radius * 1.4; // 2 radius's back
+    this.camera.position.y = center.y + sphere.radius * 0.9; // At the top of the object
+    this.camera.position.z = center.z + sphere.radius * 1.8; // 2 radius's back
   }
 
   public updateScene() {
