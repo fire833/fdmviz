@@ -9,6 +9,7 @@ import {
   MeshStandardMaterial,
   PerspectiveCamera,
   Scene,
+  ShaderMaterial,
   Sphere,
   Vector3,
   WebGLRenderer,
@@ -17,6 +18,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import { showSurfaceNormals, showVertexNormals } from '../stores';
+
+import fragShader from '../graphics/layers.frag?raw';
 
 export default class Simulator {
   private webgl: WebGLRenderer;
@@ -85,8 +88,23 @@ export default class Simulator {
           color: 'hsl(153, 60%, 71%)',
           roughness: 0.5,
         });
+
+        mesh.material = this.getShaderMaterial();
       }
     }
+  }
+
+  public getShaderMaterial() {
+    // Create Shader Material
+    var shaderMaterial = new ShaderMaterial({
+      uniforms: {
+        near: { value: this.camera.near }, // Pass the near plane value
+        far: { value: this.camera.far }, // Pass the far plane value
+      },
+      fragmentShader: fragShader,
+    });
+
+    return shaderMaterial;
   }
 
   public populateObject(geometry: BufferGeometry) {
