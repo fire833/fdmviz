@@ -1,7 +1,6 @@
 import { get } from 'svelte/store';
 import {
   AmbientLight,
-  Box3,
   BufferGeometry,
   DirectionalLight,
   Group,
@@ -130,20 +129,18 @@ export default class Simulator {
 
   // Rescale the camera to fit and be centered on the mesh
   public rescaleCamera(mesh: Mesh) {
-    // Get the center of the bounding box
-    let boundingBox = new Box3().setFromObject(mesh);
-    let center = new Vector3();
-    boundingBox.getCenter(center);
+    // Compute the bounding sphere
+    mesh.geometry.computeBoundingSphere();
+    if (!mesh.geometry.boundingSphere) return;
 
-    // Calculate the radius away the camera should be
-    const sphere = new Sphere();
-    boundingBox.getBoundingSphere(sphere);
+    const sphere: Sphere = mesh.geometry.boundingSphere;
+    const center: Vector3 = mesh.geometry.boundingSphere.center;
 
-    // Center the camera's orbit and initial position
+    // Center the camera's orbit and initial position on the circle
     this.controls.target.copy(center);
     this.camera.position.x = center.x; // Aligned with front of object
-    this.camera.position.y = center.y + sphere.radius; // At the top of the object
-    this.camera.position.z = center.z + sphere.radius * 2; // 2 radius's back
+    this.camera.position.y = center.y + sphere.radius * 0.7; // At the top of the object
+    this.camera.position.z = center.z + sphere.radius * 1.4; // 2 radius's back
   }
 
   public updateScene() {
