@@ -20,7 +20,7 @@ import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHel
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import { showSurfaceNormals, showVertexNormals, viewMode } from '../stores';
 
-import layerShader from '../graphics/layerShader.glsl';
+import layerFrag from '../graphics/layerShader.frag';
 import { ViewMode } from '../types';
 
 export default class Simulator {
@@ -97,8 +97,13 @@ export default class Simulator {
         mesh.material = new MeshNormalMaterial();
       }
       if (shader) {
+        let uniforms = {
+          color: { type: 'vec3', value: materialColor },
+        };
+
         mesh.material = new ShaderMaterial({
-          fragmentShader: layerShader,
+          uniforms: uniforms,
+          fragmentShader: layerFrag,
         });
       }
     }
