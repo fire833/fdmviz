@@ -1,7 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import Simulator from '../graphics/simulator';
-  import { fileURL, showVertexNormals, showSurfaceNormals } from '../stores';
+  import {
+    fileURL,
+    showVertexNormals,
+    showSurfaceNormals,
+    viewMode,
+  } from '../stores';
+  import { ViewMode } from '../types';
 
   let container: HTMLElement;
   let sim = new Simulator();
@@ -16,7 +22,25 @@
   });
 
   showSurfaceNormals.subscribe((value) => {
-    sim.setMeshMaterial(value);
+    if (value) {
+      sim.setMeshMaterial(false, true, false);
+    } else {
+      sim.setMeshMaterial(
+        $viewMode == ViewMode.RAW_STL,
+        false,
+        $viewMode == ViewMode.FRAG_SHADER,
+      );
+    }
+  });
+
+  viewMode.subscribe((value) => {
+    if ($showSurfaceNormals) {
+      sim.setMeshMaterial(false, true, false);
+    } else if (value == ViewMode.RAW_STL) {
+      sim.setMeshMaterial(true, false, false);
+    } else if (value == ViewMode.FRAG_SHADER) {
+      sim.setMeshMaterial(false, false, true);
+    }
   });
 
   onMount(() => {

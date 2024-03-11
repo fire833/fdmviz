@@ -17,9 +17,10 @@ import {
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
-import { showSurfaceNormals, showVertexNormals } from '../stores';
+import { showSurfaceNormals, showVertexNormals, viewMode } from '../stores';
 
-import fragShader from '../graphics/layers.frag?raw';
+import layerShader from '../graphics/layerShader.glsl';
+import { ViewMode } from '../types';
 
 export default class Simulator {
   private webgl: WebGLRenderer;
@@ -76,37 +77,30 @@ export default class Simulator {
     if (normals) normals.visible = show;
   }
 
-  public setMeshMaterial(show: boolean) {
+  public setMeshMaterial(
+    // TODO: Use enum for this input encoding
+    standard: boolean = true,
+    normals: boolean = false,
+    shader: boolean = false,
+  ) {
     let mesh = this.object.getObjectByName('mesh');
-    if (mesh! instanceof Mesh) {
-      if (show) {
-        // Show normal map material
-        mesh.material = new MeshNormalMaterial();
-      } else {
-        // Show standard material
+    if (mesh instanceof Mesh) {
+      if (standard) {
         mesh.material = new MeshStandardMaterial({
           color: 'hsl(153, 60%, 71%)',
           roughness: 0.5,
         });
-
-        mesh.material = this.getShaderMaterial();
+      }
+      if (normals) {
+        mesh.material = new MeshNormalMaterial();
+      }
+      if (shader) {
+        mesh.material = new ShaderMaterial({
+          fragmentShader: layerShader,
+        });
       }
     }
   }
-
-  public getShaderMaterial() {
-    // Create Shader Material
-    var shaderMaterial = new ShaderMaterial({
-      uniforms: {
-        near: { value: this.camera.near }, // Pass the near plane value
-        far: { value: this.camera.far }, // Pass the far plane value
-      },
-      fragmentShader: fragShader,
-    });
-
-    return shaderMaterial;
-  }
-
   public populateObject(geometry: BufferGeometry) {
     geometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
     let mesh = new Mesh(geometry, undefined);
@@ -116,7 +110,11 @@ export default class Simulator {
     this.object.add(mesh);
     this.object.add(normals);
     this.setVertexNormals(get(showVertexNormals));
-    this.setMeshMaterial(get(showSurfaceNormals));
+    this.setMeshMaterial(
+      get(viewMode) == ViewMode.RAW_STL,
+      get(showSurfaceNormals),
+      get(viewMode) == ViewMode.FRAG_SHADER,
+    );
     this.rescaleCamera(mesh);
   }
 

@@ -40,6 +40,17 @@
     <div class="left">
       <input
         type="radio"
+        id="normal"
+        name="viewMode"
+        value={ViewMode.FRAG_SHADER}
+        bind:group={$viewMode}
+      />
+      <label for="normal">Fragment Shader</label>
+    </div>
+
+    <div class="left">
+      <input
+        type="radio"
         id="particle"
         name="viewMode"
         value={ViewMode.PARTICLE_SIM}

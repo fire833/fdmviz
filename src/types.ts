@@ -1,7 +1,14 @@
 export enum ViewMode {
   RAW_STL,
+  FRAG_SHADER,
   PARTICLE_SIM,
   NORMAL_MAP,
+}
+
+export enum MeshMaterial {
+  STANDARD,
+  FRAG_SHADER,
+  NORMALS,
 }
 
 // TODO: Unused interface
