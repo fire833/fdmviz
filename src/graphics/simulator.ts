@@ -2,6 +2,7 @@ import { get } from 'svelte/store';
 import {
   AmbientLight,
   BufferGeometry,
+  Color,
   DirectionalLight,
   Group,
   Mesh,
@@ -85,9 +86,10 @@ export default class Simulator {
   ) {
     let mesh = this.object.getObjectByName('mesh');
     if (mesh instanceof Mesh) {
+      let materialColor = new Color('hsl(153, 60%, 71%)');
       if (standard) {
         mesh.material = new MeshStandardMaterial({
-          color: 'hsl(153, 60%, 71%)',
+          color: materialColor,
           roughness: 0.5,
         });
       }
@@ -101,6 +103,7 @@ export default class Simulator {
       }
     }
   }
+
   public populateObject(geometry: BufferGeometry) {
     geometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
     let mesh = new Mesh(geometry, undefined);
