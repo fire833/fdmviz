@@ -19,5 +19,5 @@ void main() {
 
     // Alter color vased on offset
     vec3 slope = asin(offsetV * curveFactor) * shadowMagnitude + shadowOffset;
-    gl_FragColor = vec4( mix(slope, color, 0.6) , 1.0);
+    gl_FragColor = vec4( mix(slope, color, colorMix) , 1.0);
 }
