@@ -37,12 +37,15 @@ export default class Simulator {
 
   private object: Group; // Holds the mesh
 
+  private sceneTimer: number = 0;
+  public start: boolean = false;
+
   constructor() {
     // Set up renderer
     this.webgl = new WebGLRenderer({ antialias: true, alpha: true });
     this.webgl.setSize(window.innerWidth, window.innerHeight); // Default to full size of the window.
     this.webgl.setAnimationLoop(() => {
-      this.render();
+      this.animate();
     }); // Rerender the scene on every frame
 
     // Set up scene
@@ -172,14 +175,26 @@ export default class Simulator {
     this.camera.position.z = center.z + sphere.radius * 1.8; // 2 radius's back
   }
 
+  public showPhysics() {
+    if (this.start == true) {
+      this.object.position.setX(
+        this.object.position.x + Math.sin(this.sceneTimer) / 20,
+      );
+      this.object.position.setY(
+        this.object.position.y + Math.cos(this.sceneTimer) / 20,
+      );
+    }
+  }
+
   public updateScene() {
     // Update view based on controls (mouse)
     this.controls.update();
   }
-
-  public render() {
+  public animate() {
+    this.sceneTimer += 6;
     this.updateScene();
     this.webgl.render(this.scene, this.camera);
+    this.showPhysics();
   }
 
   public getHTMLElement(): HTMLElement {

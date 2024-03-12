@@ -55,7 +55,6 @@
         name="viewMode"
         value={ViewMode.PARTICLE_SIM}
         bind:group={$viewMode}
-        disabled
       />
       <label for="particle">Particle Simulation</label>
     </div>
