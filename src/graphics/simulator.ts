@@ -21,6 +21,7 @@ import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import { showSurfaceNormals, showVertexNormals, viewMode } from '../stores';
 
 import layerFrag from '../graphics/layerShader.frag';
+import layerVert from '../graphics/layerShader.vert';
 import { ViewMode } from '../types';
 
 export default class Simulator {
@@ -103,6 +104,7 @@ export default class Simulator {
 
         mesh.material = new ShaderMaterial({
           uniforms: uniforms,
+          vertexShader: layerVert,
           fragmentShader: layerFrag,
         });
       }

@@ -5,7 +5,6 @@ varying vec3 vUv;
 
 void main() {
     // Normalize the height value to the range [0, 1]
-    float height = (gl_FragCoord.y / 20.0);
-    float normalizedHeight = mod(height, 5.0 * gl_FragCoord.w) + 0.7;
+    float normalizedHeight = mod(vUv.y / 0.3, 0.75) + 0.5;
     gl_FragColor = vec4(mix(vec3(normalizedHeight, normalizedHeight, normalizedHeight), color, 0.6), 1.0);
 }
