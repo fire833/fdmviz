@@ -38,7 +38,6 @@ export default class Simulator {
   private object: Group; // Holds the mesh
 
   private sceneTimer: number = 0;
-  public start: boolean = false;
 
   constructor() {
     // Set up renderer
@@ -176,7 +175,7 @@ export default class Simulator {
   }
 
   public showPhysics() {
-    if (this.start == true) {
+    if (get(viewMode) == ViewMode.PARTICLE_SIM) {
       this.object.position.setX(
         this.object.position.x + Math.sin(this.sceneTimer) / 20,
       );
