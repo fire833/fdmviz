@@ -6,13 +6,12 @@
     showVertexNormals,
     showSurfaceNormals,
     viewMode,
+    layerHeight,
   } from '../stores';
-  import { ViewMode } from '../types';
 
   let container: HTMLElement;
   let sim = new Simulator();
 
-  // If the fileURL updates, update the sim's mesh
   fileURL.subscribe((value) => {
     sim.uploadMesh(value);
   });
@@ -21,27 +20,9 @@
     sim.setVertexNormals(value);
   });
 
-  showSurfaceNormals.subscribe((value) => {
-    if (value) {
-      sim.setMeshMaterial(false, true, false);
-    } else {
-      sim.setMeshMaterial(
-        $viewMode == ViewMode.RAW_STL,
-        false,
-        $viewMode == ViewMode.FRAG_SHADER,
-      );
-    }
-  });
-
-  viewMode.subscribe((value) => {
-    if ($showSurfaceNormals) {
-      sim.setMeshMaterial(false, true, false);
-    } else if (value == ViewMode.RAW_STL) {
-      sim.setMeshMaterial(true, false, false);
-    } else if (value == ViewMode.FRAG_SHADER) {
-      sim.setMeshMaterial(false, false, true);
-    }
-  });
+  viewMode.subscribe(() => sim.updateMeshMaterial());
+  showSurfaceNormals.subscribe(() => sim.updateMeshMaterial());
+  layerHeight.subscribe(() => sim.updateMeshMaterial());
 
   onMount(() => {
     container.appendChild(sim.getHTMLElement());

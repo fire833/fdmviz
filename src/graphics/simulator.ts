@@ -18,7 +18,12 @@ import {
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
-import { showSurfaceNormals, showVertexNormals, viewMode } from '../stores';
+import {
+  layerHeight,
+  showSurfaceNormals,
+  showVertexNormals,
+  viewMode,
+} from '../stores';
 
 import layerFrag from '../graphics/layerShader.frag';
 import layerVert from '../graphics/layerShader.vert';
@@ -47,11 +52,11 @@ export default class Simulator {
     const ambientLight = new AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
 
-    const directLight = new DirectionalLight('hsl(194, 70%, 90%)', 3);
+    const directLight = new DirectionalLight('hsl(0, 0%, 100%)', 3);
     directLight.position.set(5, 15, 35);
     this.scene.add(directLight);
 
-    const directLight2 = new DirectionalLight('hsl(194, 40%, 60%)', 3);
+    const directLight2 = new DirectionalLight('hsl(0, 0%, 100%)', 2);
     directLight2.position.set(5, -15, -35);
     this.scene.add(directLight2);
 
@@ -79,27 +84,29 @@ export default class Simulator {
     if (normals) normals.visible = show;
   }
 
-  public setMeshMaterial(
-    // TODO: Use enum for this input encoding
-    standard: boolean = true,
-    normals: boolean = false,
-    shader: boolean = false,
-  ) {
+  public updateMeshMaterial() {
     let mesh = this.object.getObjectByName('mesh');
     if (mesh instanceof Mesh) {
+      if (get(showSurfaceNormals)) {
+        // Turn on normal material
+        mesh.material = new MeshNormalMaterial();
+        return;
+      }
+
       let materialColor = new Color('hsl(153, 60%, 71%)');
-      if (standard) {
+
+      if (get(viewMode) == ViewMode.RAW_STL) {
+        // Turn on standard material
         mesh.material = new MeshStandardMaterial({
           color: materialColor,
           roughness: 0.5,
         });
       }
-      if (normals) {
-        mesh.material = new MeshNormalMaterial();
-      }
-      if (shader) {
+      if (get(viewMode) == ViewMode.SHADER) {
+        // Turn on shader material
         let uniforms = {
           color: { type: 'vec3', value: materialColor },
+          layerHeight: { type: 'float', value: get(layerHeight) },
         };
 
         mesh.material = new ShaderMaterial({
@@ -120,11 +127,7 @@ export default class Simulator {
     this.object.add(mesh);
     this.object.add(normals);
     this.setVertexNormals(get(showVertexNormals));
-    this.setMeshMaterial(
-      get(viewMode) == ViewMode.RAW_STL,
-      get(showSurfaceNormals),
-      get(viewMode) == ViewMode.FRAG_SHADER,
-    );
+    this.updateMeshMaterial();
     this.rescaleCamera(mesh);
   }
 

@@ -42,7 +42,7 @@
         type="radio"
         id="normal"
         name="viewMode"
-        value={ViewMode.FRAG_SHADER}
+        value={ViewMode.SHADER}
         bind:group={$viewMode}
       />
       <label for="normal">Fragment Shader</label>
@@ -77,22 +77,21 @@
     <h2>Parameters</h2>
 
     <div class="grid">
-      <div class="align">Sim Speed (TPS)</div>
-      <input
-        type="number"
-        bind:value={$simSpeed}
-        min="0.25"
-        max="4.0"
-        step="0.25"
-        disabled
-      />
       <div class="align">Layer Height (mm)</div>
       <input
         type="number"
         bind:value={$layerHeight}
         min="0.05"
-        max="1"
+        max="2"
         step="0.05"
+      />
+      <div class="align">Sim Speed (TPS)</div>
+      <input
+        type="number"
+        bind:value={$simSpeed}
+        min="0.05"
+        max="4.0"
+        step="0.25"
         disabled
       />
       <div class="align">Temperature (°C)</div>
