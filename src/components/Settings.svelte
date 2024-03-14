@@ -74,10 +74,9 @@
       <input
         type="number"
         bind:value={$simSpeed}
-        min="0.05"
+        min="0.25"
         max="4.0"
         step="0.25"
-        disabled
       />
       <div class="align">Temperature (°C)</div>
       <input

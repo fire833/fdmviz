@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import Simulator from '../graphics/simulator';
+  import Simulator from '../graphics/Simulator';
   import {
     fileURL,
     showVertexNormals,
@@ -9,12 +9,14 @@
     layerHeight,
     orbit,
   } from '../stores';
+  import { ViewMode } from '../types';
 
   let container: HTMLElement;
   let sim = new Simulator();
 
   fileURL.subscribe((value: string) => {
     sim.uploadMesh(value);
+    sim.resetPhysics();
   });
 
   orbit.subscribe((value: boolean) => {
@@ -25,7 +27,11 @@
     sim.setVertexNormals(value);
   });
 
-  viewMode.subscribe(() => sim.updateMeshMaterial());
+  viewMode.subscribe((value) => {
+    sim.updateMeshMaterial();
+    sim.resetPhysics();
+  });
+
   showSurfaceNormals.subscribe(() => sim.updateMeshMaterial());
   layerHeight.subscribe(() => sim.updateMeshMaterial());
 

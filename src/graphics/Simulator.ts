@@ -5,7 +5,6 @@ import {
   Clock,
   Color,
   DirectionalLight,
-  Group,
   LineSegments,
   Mesh,
   MeshNormalMaterial,
@@ -28,9 +27,11 @@ import {
   orbit,
   showSurfaceNormals,
   showVertexNormals,
+  simSpeed,
   viewMode,
 } from '../stores';
 import { ViewMode } from '../types';
+import { PhysicsObject } from './PhysicsObject';
 
 export default class Simulator {
   private webgl: WebGLRenderer;
@@ -40,10 +41,10 @@ export default class Simulator {
   // Scene state
   private scene: Scene;
   private clock: Clock; // Timer for physics/animations
-  private group: Group; // Holds the mesh and normals
+  private group: PhysicsObject; // Holds the mesh and normals
   private mesh: Mesh | undefined;
   private normals: LineSegments | undefined;
-  private sceneTimer: number = 0;
+  private simSpeed: number;
 
   constructor() {
     // Set up renderer
@@ -56,6 +57,11 @@ export default class Simulator {
     // Set up scene
     this.scene = new Scene();
     this.clock = new Clock(); // Autostart on first call
+
+    this.simSpeed = get(simSpeed);
+    simSpeed.subscribe((value) => {
+      this.simSpeed = value;
+    });
 
     // Add some lights
     const ambientLight = new AmbientLight(0xffffff, 0.5);
@@ -70,7 +76,7 @@ export default class Simulator {
     this.scene.add(directLight2);
 
     // Initialize the group containing the mesh
-    this.group = new Group();
+    this.group = new PhysicsObject();
     this.scene.add(this.group);
 
     // Set up camera
@@ -180,16 +186,17 @@ export default class Simulator {
     this.camera.position.z = center.z + sphere.radius * 1.8; // 2 radius's back
   }
 
-  public updatePhysics(t: number) {
-    const freq = 0.1; // Frequency (hz)
-    const amp = 0.05; // Amplitude
-    const angle = 2 * Math.PI * t;
-    this.group.position.setX(
-      this.group.position.x + Math.sin(angle * freq) * amp,
-    );
-    this.group.position.setY(
-      this.group.position.y + Math.cos(angle * freq) * amp,
-    );
+  public resetPhysics() {
+    if (get(viewMode) == ViewMode.PARTICLE_SIM) {
+      this.clock = new Clock();
+      this.group.position.y = 0;
+      this.group.v = new Vector3(0, 10, 0);
+      this.group.a = new Vector3(0, -10, 0); // Accelerate downwards
+    }
+  }
+
+  public updatePhysics(delta: number) {
+    this.group.stepPhysics(delta);
   }
 
   public updateScene() {
@@ -197,7 +204,7 @@ export default class Simulator {
     this.controls.update();
     // Update the physics model
     if (get(viewMode) == ViewMode.PARTICLE_SIM) {
-      this.updatePhysics(this.clock.getElapsedTime());
+      this.updatePhysics(this.clock.getDelta() * get(simSpeed));
     }
   }
 
