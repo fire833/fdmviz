@@ -13,7 +13,6 @@
     thermalTransfer,
     showSurfaceNormals,
   } from '../stores';
-  import { modelNormalMatrix } from 'three/examples/jsm/nodes/Nodes.js';
 
   const dispatchModalEvent = createEventDispatcher();
 

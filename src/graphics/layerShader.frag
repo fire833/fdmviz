@@ -1,5 +1,7 @@
-precision highp float;
+precision mediump float;
 
+uniform mat4 viewMatrix;
+uniform vec3 cameraPosition;
 uniform vec3 color; 
 uniform float layerHeight; 
 varying vec3 vUv;

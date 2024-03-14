@@ -5,12 +5,13 @@ import {
   Color,
   DirectionalLight,
   Group,
+  LineSegments,
   Mesh,
   MeshNormalMaterial,
   MeshStandardMaterial,
   PerspectiveCamera,
+  RawShaderMaterial,
   Scene,
-  ShaderMaterial,
   Sphere,
   Vector3,
   WebGLRenderer,
@@ -31,12 +32,14 @@ import { ViewMode } from '../types';
 
 export default class Simulator {
   private webgl: WebGLRenderer;
-  private scene: Scene;
   private camera: PerspectiveCamera;
   private controls: OrbitControls;
 
-  private object: Group; // Holds the mesh
-
+  // Scene state
+  private scene: Scene;
+  private group: Group; // Holds the mesh and normals
+  private mesh: Mesh | undefined;
+  private normals: LineSegments | undefined;
   private sceneTimer: number = 0;
 
   constructor() {
@@ -63,8 +66,8 @@ export default class Simulator {
     this.scene.add(directLight2);
 
     // Initialize the group containing the mesh
-    this.object = new Group();
-    this.scene.add(this.object);
+    this.group = new Group();
+    this.scene.add(this.group);
 
     // Set up camera
     this.camera = new PerspectiveCamera(
@@ -82,58 +85,50 @@ export default class Simulator {
   }
 
   public setVertexNormals(show: boolean) {
-    let normals = this.object.getObjectByName('normals');
-    if (normals) normals.visible = show;
+    if (this.normals) this.normals.visible = show;
   }
 
   public updateMeshMaterial() {
-    let mesh = this.object.getObjectByName('mesh');
-    if (mesh instanceof Mesh) {
-      if (get(showSurfaceNormals)) {
-        // Turn on normal material
-        mesh.material = new MeshNormalMaterial();
-        return;
-      }
+    if (!this.mesh) return;
 
-      let materialColor = new Color('hsl(153, 60%, 71%)');
-
-      if (
-        get(viewMode) == ViewMode.RAW_STL ||
-        get(viewMode) == ViewMode.PARTICLE_SIM
-      ) {
-        // Turn on standard material
-        mesh.material = new MeshStandardMaterial({
-          color: materialColor,
-          roughness: 0.5,
-        });
-      }
-      if (get(viewMode) == ViewMode.SHADER) {
-        // Turn on shader material
-        let uniforms = {
-          color: { type: 'vec3', value: materialColor },
-          layerHeight: { type: 'float', value: get(layerHeight) },
-        };
-
-        mesh.material = new ShaderMaterial({
-          uniforms: uniforms,
-          vertexShader: layerVert,
-          fragmentShader: layerFrag,
-        });
-      }
+    if (get(showSurfaceNormals)) {
+      // Turn on normal material
+      this.mesh.material = new MeshNormalMaterial();
+      return;
     }
+
+    let materialColor = new Color('hsl(153, 60%, 71%)');
+
+    if (get(viewMode) == ViewMode.SHADER) {
+      // Turn on shader material
+      let uniforms = {
+        color: { type: 'vec3', value: materialColor },
+        layerHeight: { type: 'float', value: get(layerHeight) },
+      };
+      this.mesh.material = new RawShaderMaterial({
+        uniforms: uniforms,
+        vertexShader: layerVert,
+        fragmentShader: layerFrag,
+      });
+      return;
+    }
+
+    // Default, turn on standard material
+    this.mesh.material = new MeshStandardMaterial({
+      color: materialColor,
+      roughness: 0.5,
+    });
   }
 
   public populateObject(geometry: BufferGeometry) {
     geometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
-    let mesh = new Mesh(geometry, undefined);
-    let normals = new VertexNormalsHelper(mesh, 1, 0xa4036f);
-    mesh.name = 'mesh';
-    normals.name = 'normals';
-    this.object.add(mesh);
-    this.object.add(normals);
+    this.mesh = new Mesh(geometry, undefined);
+    this.normals = new VertexNormalsHelper(this.mesh, 1, 0xa4036f);
+    this.group.add(this.mesh);
+    this.group.add(this.normals);
     this.setVertexNormals(get(showVertexNormals));
     this.updateMeshMaterial();
-    this.rescaleCamera(mesh);
+    this.rescaleCamera(this.mesh);
   }
 
   // Upload the mesh being displayed based on a certain fileURL
@@ -141,7 +136,7 @@ export default class Simulator {
   // utah_teapot.stl
   public uploadMesh(fileURL: string = 'utah_teapot.stl') {
     // Remove previous mesh
-    this.object.clear();
+    this.group.clear();
 
     // Load STL
     const loader = new STLLoader();
@@ -178,18 +173,20 @@ export default class Simulator {
   }
 
   public updatePhysics(t: number) {
-    this.sceneTimer += 6;
-    this.object.position.setX(this.object.position.x + Math.sin(t) / 20);
-    this.object.position.setY(this.object.position.y + Math.cos(t) / 20);
+    this.group.position.setX(this.group.position.x + Math.sin(t / 200) / 20);
+    this.group.position.setY(this.group.position.y + Math.cos(t / 200) / 20);
   }
 
   public updateScene() {
     // Update view based on controls (mouse)
     this.controls.update();
+    // Update the physics model
     if (get(viewMode) == ViewMode.PARTICLE_SIM) {
+      this.sceneTimer += 6;
       this.updatePhysics(this.sceneTimer);
     }
   }
+
   public animate() {
     this.updateScene();
     this.webgl.render(this.scene, this.camera);
