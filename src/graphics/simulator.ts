@@ -25,6 +25,7 @@ import layerFrag from '../graphics/layerShader.frag';
 import layerVert from '../graphics/layerShader.vert';
 import {
   layerHeight,
+  orbit,
   showSurfaceNormals,
   showVertexNormals,
   viewMode,
@@ -82,9 +83,13 @@ export default class Simulator {
 
     // Add orbit controls for the mouse
     this.controls = new OrbitControls(this.camera, this.webgl.domElement);
-    this.controls.autoRotate = true;
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.3;
+    this.setOrbitCamera(get(orbit));
+  }
+
+  public setOrbitCamera(set: boolean) {
+    this.controls.autoRotate = set;
   }
 
   public setVertexNormals(show: boolean) {

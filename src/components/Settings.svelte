@@ -12,6 +12,7 @@
     wetFilament,
     thermalTransfer,
     showSurfaceNormals,
+    orbit,
   } from '../stores';
 
   const dispatchModalEvent = createEventDispatcher();
@@ -93,6 +94,10 @@
   <div class="section">
     <h2>Features</h2>
 
+    <div class="left">
+      <input type="checkbox" id="orbit" bind:checked={$orbit} />
+      <label for="orbit">Orbit Camera</label>
+    </div>
     <div class="left">
       <input
         type="checkbox"

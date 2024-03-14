@@ -10,6 +10,7 @@ export const simSpeed = writable<Number>(0.1);
 export const layerHeight = writable<Number>(0.2); // mm
 export const temperature = writable<Number>(150); // °C
 // Features
+export const orbit = writable<boolean>(true);
 export const showVertexNormals = writable<boolean>(false);
 export const showSurfaceNormals = writable<boolean>(false);
 export const meltyParticles = writable<boolean>(false);

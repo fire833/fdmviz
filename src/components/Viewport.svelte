@@ -7,6 +7,7 @@
     showSurfaceNormals,
     viewMode,
     layerHeight,
+    orbit,
   } from '../stores';
 
   let container: HTMLElement;
@@ -14,6 +15,10 @@
 
   fileURL.subscribe((value: string) => {
     sim.uploadMesh(value);
+  });
+
+  orbit.subscribe((value: boolean) => {
+    sim.setOrbitCamera(value);
   });
 
   showVertexNormals.subscribe((value: boolean) => {
