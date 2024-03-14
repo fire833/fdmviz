@@ -2,6 +2,7 @@ import { get } from 'svelte/store';
 import {
   AmbientLight,
   BufferGeometry,
+  Clock,
   Color,
   DirectionalLight,
   Group,
@@ -37,6 +38,7 @@ export default class Simulator {
 
   // Scene state
   private scene: Scene;
+  private clock: Clock; // Timer for physics/animations
   private group: Group; // Holds the mesh and normals
   private mesh: Mesh | undefined;
   private normals: LineSegments | undefined;
@@ -52,6 +54,7 @@ export default class Simulator {
 
     // Set up scene
     this.scene = new Scene();
+    this.clock = new Clock(true);
 
     // Add some lights
     const ambientLight = new AmbientLight(0xffffff, 0.5);
@@ -173,8 +176,15 @@ export default class Simulator {
   }
 
   public updatePhysics(t: number) {
-    this.group.position.setX(this.group.position.x + Math.sin(t / 200) / 20);
-    this.group.position.setY(this.group.position.y + Math.cos(t / 200) / 20);
+    const freq = 0.1; // Frequency (hz)
+    const amp = 0.05; // Amplitude
+    const angle = 2 * Math.PI * t;
+    this.group.position.setX(
+      this.group.position.x + Math.sin(angle * freq) * amp,
+    );
+    this.group.position.setY(
+      this.group.position.y + Math.cos(angle * freq) * amp,
+    );
   }
 
   public updateScene() {
@@ -182,8 +192,7 @@ export default class Simulator {
     this.controls.update();
     // Update the physics model
     if (get(viewMode) == ViewMode.PARTICLE_SIM) {
-      this.sceneTimer += 6;
-      this.updatePhysics(this.sceneTimer);
+      this.updatePhysics(this.clock.getElapsedTime());
     }
   }
 

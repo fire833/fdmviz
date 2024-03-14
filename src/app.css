@@ -58,7 +58,7 @@ button,
   
   padding: 0.4em 0.4em;
 
-  transition: 0.2s ease-in-out;
+  transition: 0.2s;
 
   cursor:pointer;
 }
