@@ -204,7 +204,7 @@ export default class Simulator {
     this.controls.update();
     // Update the physics model
     if (get(viewMode) == ViewMode.PARTICLE_SIM) {
-      this.updatePhysics(this.clock.getDelta() * get(simSpeed));
+      this.updatePhysics(this.clock.getDelta() * this.simSpeed);
     }
   }
 

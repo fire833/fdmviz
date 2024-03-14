@@ -22,7 +22,7 @@ export class PhysicsObject extends Group {
         return;
       }
       // Bounce
-      this.v.y = Math.abs(this.v.y) + 0.1;
+      this.v.y = Math.abs(this.v.y);
     }
 
     this.v.addScaledVector(this.a, delta); // Update velocity
