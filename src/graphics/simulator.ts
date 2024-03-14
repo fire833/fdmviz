@@ -54,7 +54,7 @@ export default class Simulator {
 
     // Set up scene
     this.scene = new Scene();
-    this.clock = new Clock(true);
+    this.clock = new Clock(); // Autostart on first call
 
     // Add some lights
     const ambientLight = new AmbientLight(0xffffff, 0.5);
