@@ -13,8 +13,25 @@
     thermalTransfer,
     showSurfaceNormals,
   } from '../stores';
+  import { modelNormalMatrix } from 'three/examples/jsm/nodes/Nodes.js';
 
   const dispatchModalEvent = createEventDispatcher();
+
+  const viewModes = [
+    { label: 'Raw 3D File', id: 'raw', value: ViewMode.RAW_STL },
+    { label: 'Fragment Shader', id: 'shader', value: ViewMode.SHADER },
+    {
+      label: 'Particle Simulation',
+      id: 'particle',
+      value: ViewMode.PARTICLE_SIM,
+    },
+    {
+      label: 'Normal Map',
+      id: 'normal',
+      value: ViewMode.NORMAL_MAP,
+      disabled: true,
+    },
+  ];
 </script>
 
 <div class="ui">
@@ -26,50 +43,19 @@
   <div class="section">
     <h2>Visualizer Mode</h2>
 
-    <div class="left">
-      <input
-        type="radio"
-        id="raw"
-        name="viewMode"
-        value={ViewMode.RAW_STL}
-        bind:group={$viewMode}
-      />
-      <label for="raw">Raw 3D File</label>
-    </div>
-
-    <div class="left">
-      <input
-        type="radio"
-        id="normal"
-        name="viewMode"
-        value={ViewMode.SHADER}
-        bind:group={$viewMode}
-      />
-      <label for="normal">Fragment Shader</label>
-    </div>
-
-    <div class="left">
-      <input
-        type="radio"
-        id="particle"
-        name="viewMode"
-        value={ViewMode.PARTICLE_SIM}
-        bind:group={$viewMode}
-      />
-      <label for="particle">Particle Simulation</label>
-    </div>
-
-    <div class="left">
-      <input
-        type="radio"
-        id="normal"
-        name="viewMode"
-        value={ViewMode.NORMAL_MAP}
-        bind:group={$viewMode}
-        disabled
-      />
-      <label for="normal">Normal Map</label>
-    </div>
+    {#each viewModes as mode}
+      <div class="left">
+        <input
+          type="radio"
+          id={mode.id}
+          name="viewMode"
+          value={mode.value}
+          bind:group={$viewMode}
+          disabled={mode.disabled}
+        />
+        <label for={mode.id}>{mode.label}</label>
+      </div>
+    {/each}
   </div>
 
   <div class="section">

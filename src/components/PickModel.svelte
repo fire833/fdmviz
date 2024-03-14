@@ -8,21 +8,21 @@
   }
   let mode: Mode = Mode.Preset;
 
-  let presets: Map<string, string> = new Map([
+  let presets = [
     ['Utah Teapot', 'utah_teapot.stl'], // Default, local
     [
       '3DBenchy',
       'https://raw.githubusercontent.com/CreativeTools/3DBenchy/master/Single-part/3DBenchy.stl',
     ],
     [
-      'Moon City (Kijai)',
-      'https://files.printables.com/media/prints/218224/stls/1989695_3025bf16-6dda-4a73-8825-f4f98dd4728f/moon-city-2.stl',
+      'Test Print (Gabbox3D)',
+      'https://files.printables.com/media/prints/112181/stls/1101993_ab05a0a9-23ad-451c-84ea-c6c1bca52aee/all_in_one_3d_printer_test.stl',
     ],
     [
       'Heavy Metal Groot (Max666)',
       'https://files.printables.com/media/prints/16627/stls/158987_fd548c76-c58f-4a26-9f5b-d6639e6cbad2/heavy_metal_groot_01.stl',
     ],
-  ]);
+  ];
 
   let textInput: string;
 
@@ -68,19 +68,17 @@
         }}>URL</button
       >
     </div>
-    {#if mode == Mode.Preset}
-      <div class="section">
+    <div class="section">
+      {#if mode == Mode.Preset}
         <p>Pick a preset 3D Model</p>
         <div class="list">
-          {#each [...presets] as [name, url]}
+          {#each presets as [name, url]}
             <button class="list-item" on:click={() => updateModel(url)}>
               {name}
             </button>
           {/each}
         </div>
-      </div>
-    {:else if mode == Mode.Upload}
-      <div class="section">
+      {:else if mode == Mode.Upload}
         <p>Upload an STL model</p>
         <button on:click={() => fileButton.click()}>Pick file</button>
         <input
@@ -89,15 +87,13 @@
           bind:files={fileUploads}
           accept=".stl"
         />
-      </div>
-    {:else}
-      <div class="section">
+      {:else}
         <p>Enter a URL to an STL file</p>
         <form on:submit|preventDefault={() => updateModel(textInput)}>
           <input type="text" placeholder="https://" bind:value={textInput} />
         </form>
-      </div>
-    {/if}
+      {/if}
+    </div>
   </div>
 </dialog>
 

@@ -12,11 +12,11 @@
   let container: HTMLElement;
   let sim = new Simulator();
 
-  fileURL.subscribe((value) => {
+  fileURL.subscribe((value: string) => {
     sim.uploadMesh(value);
   });
 
-  showVertexNormals.subscribe((value) => {
+  showVertexNormals.subscribe((value: boolean) => {
     sim.setVertexNormals(value);
   });
 

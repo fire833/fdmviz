@@ -18,15 +18,15 @@ import {
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
+
+import layerFrag from '../graphics/layerShader.frag';
+import layerVert from '../graphics/layerShader.vert';
 import {
   layerHeight,
   showSurfaceNormals,
   showVertexNormals,
   viewMode,
 } from '../stores';
-
-import layerFrag from '../graphics/layerShader.frag';
-import layerVert from '../graphics/layerShader.vert';
 import { ViewMode } from '../types';
 
 export default class Simulator {
@@ -97,7 +97,10 @@ export default class Simulator {
 
       let materialColor = new Color('hsl(153, 60%, 71%)');
 
-      if (get(viewMode) == ViewMode.RAW_STL) {
+      if (
+        get(viewMode) == ViewMode.RAW_STL ||
+        get(viewMode) == ViewMode.PARTICLE_SIM
+      ) {
         // Turn on standard material
         mesh.material = new MeshStandardMaterial({
           color: materialColor,
@@ -174,26 +177,22 @@ export default class Simulator {
     this.camera.position.z = center.z + sphere.radius * 1.8; // 2 radius's back
   }
 
-  public showPhysics() {
-    if (get(viewMode) == ViewMode.PARTICLE_SIM) {
-      this.object.position.setX(
-        this.object.position.x + Math.sin(this.sceneTimer) / 20,
-      );
-      this.object.position.setY(
-        this.object.position.y + Math.cos(this.sceneTimer) / 20,
-      );
-    }
+  public updatePhysics(t: number) {
+    this.sceneTimer += 6;
+    this.object.position.setX(this.object.position.x + Math.sin(t) / 20);
+    this.object.position.setY(this.object.position.y + Math.cos(t) / 20);
   }
 
   public updateScene() {
     // Update view based on controls (mouse)
     this.controls.update();
+    if (get(viewMode) == ViewMode.PARTICLE_SIM) {
+      this.updatePhysics(this.sceneTimer);
+    }
   }
   public animate() {
-    this.sceneTimer += 6;
     this.updateScene();
     this.webgl.render(this.scene, this.camera);
-    this.showPhysics();
   }
 
   public getHTMLElement(): HTMLElement {

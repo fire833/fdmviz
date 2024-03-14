@@ -588,15 +588,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bower@npm:^1.8.14":
-  version: 1.8.14
-  resolution: "bower@npm:1.8.14"
-  bin:
-    bower: bin/bower
-  checksum: 10c0/dbf71f95eaf34785f98793b8dfa2c1eba0b18b9e94b5c052f2019cfbe6135c041f106901c3e96fdc1d83b486472a8da8aea245b1490fe0ea4211f13ea8dd3463
-  languageName: node
-  linkType: hard
-
 "brace-expansion@npm:^1.1.7":
   version: 1.1.11
   resolution: "brace-expansion@npm:1.1.11"
@@ -658,27 +649,6 @@ __metadata:
   checksum: 10c0/fff92277400eb06c3079f9e74f3af120db9f8ea03bad0e84d9aede54bbe2d44a56cccb5f6cf12211f93f52306df87077ecec5b712794c5a9b5dac6d615a3f301
   languageName: node
   linkType: hard
-
-"cgproj@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "cgproj@workspace:."
-  dependencies:
-    "@sveltejs/vite-plugin-svelte": "npm:^3.0.1"
-    "@tsconfig/svelte": "npm:^5.0.2"
-    "@types/three": "npm:^0"
-    bower: "npm:^1.8.14"
-    jquery: "npm:^3.7.1"
-    prettier: "npm:^3.2.5"
-    prettier-plugin-organize-imports: "npm:^3.2.4"
-    svelte: "npm:^4.2.8"
-    svelte-check: "npm:^3.6.2"
-    three: "npm:^0.161.0"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
-    vite: "npm:^5.0.8"
-    vite-plugin-glsl: "npm:^1.2.1"
-  languageName: unknown
-  linkType: soft
 
 "chokidar@npm:^3.4.1":
   version: 3.6.0
@@ -979,6 +949,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fdmviz@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "fdmviz@workspace:."
+  dependencies:
+    "@sveltejs/vite-plugin-svelte": "npm:^3.0.1"
+    "@tsconfig/svelte": "npm:^5.0.2"
+    "@types/three": "npm:^0"
+    prettier: "npm:^3.2.5"
+    prettier-plugin-organize-imports: "npm:^3.2.4"
+    svelte: "npm:^4.2.8"
+    svelte-check: "npm:^3.6.2"
+    three: "npm:^0.161.0"
+    tslib: "npm:^2.6.2"
+    typescript: "npm:^5.2.2"
+    vite: "npm:^5.0.8"
+    vite-plugin-glsl: "npm:^1.2.1"
+  languageName: unknown
+  linkType: soft
+
 "fflate@npm:~0.6.10":
   version: 0.6.10
   resolution: "fflate@npm:0.6.10"
@@ -1260,13 +1249,6 @@ __metadata:
     "@pkgjs/parseargs":
       optional: true
   checksum: 10c0/f01d8f972d894cd7638bc338e9ef5ddb86f7b208ce177a36d718eac96ec86638a6efa17d0221b10073e64b45edc2ce15340db9380b1f5d5c5d000cbc517dc111
-  languageName: node
-  linkType: hard
-
-"jquery@npm:^3.7.1":
-  version: 3.7.1
-  resolution: "jquery@npm:3.7.1"
-  checksum: 10c0/808cfbfb758438560224bf26e17fcd5afc7419170230c810dd11f5c1792e2263e2970cca8d659eb84fcd9acc301edb6d310096e450277d54be4f57071b0c82d9
   languageName: node
   linkType: hard
 
