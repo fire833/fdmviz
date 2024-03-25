@@ -1,6 +1,6 @@
 import { BufferAttribute, Mesh } from 'three';
 
-export function generateUVs(mesh: Mesh) {
+export function generateUVs(mesh: Mesh): void {
   const posAttribute = mesh.geometry.getAttribute('position');
   const uvAttribute = new BufferAttribute(
     new Float32Array(posAttribute.count * 2),
