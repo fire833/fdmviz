@@ -15,6 +15,7 @@ import {
   Scene,
   Sphere,
   TextureLoader,
+  Vector2,
   Vector3,
   WebGLRenderer,
 } from 'three';
@@ -136,14 +137,16 @@ export default class Simulator {
 
     if (get(viewMode) == ViewMode.TEXTURE) {
       // Turn on standard material with normal map
-      const normalTexture = new TextureLoader().load('/denim.jpg');
-      normalTexture.repeat;
+      const normalTexture = new TextureLoader().load('alan_warburton.png');
+      const scale = Math.pow(2, get(layerHeight));
+      normalTexture.repeat = new Vector2(1, scale);
       generateUVs(this.mesh);
 
       this.mesh.material = new MeshPhysicalMaterial({
         color: materialColor,
         roughness: 0.2,
         normalMap: normalTexture,
+        normalScale: new Vector2(0.7, 0.7),
         displacementMap: normalTexture,
         displacementScale: 0.2,
         displacementBias: -0.1,
