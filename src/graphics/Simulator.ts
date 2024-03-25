@@ -135,13 +135,7 @@ export default class Simulator {
     }
 
     if (get(viewMode) == ViewMode.TEXTURE) {
-      var geometry = this.mesh.geometry;
-
-      geometry = toCreasedNormals(geometry, Math.PI / 3);
-      geometry = mergeVertices(geometry);
-      geometry.computeVertexNormals();
       // Turn on standard material with normal map
-
       const normalTexture = new TextureLoader().load('/denim.jpg');
       normalTexture.repeat;
       generateUVs(this.mesh);
@@ -167,6 +161,11 @@ export default class Simulator {
   public populateObject(geometry: BufferGeometry) {
     geometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
     this.mesh = new Mesh(geometry, undefined);
+    if (get(viewMode) == ViewMode.TEXTURE) {
+      geometry = toCreasedNormals(geometry, Math.PI / 3);
+      geometry = mergeVertices(geometry);
+      geometry.computeVertexNormals();
+    }
     this.normals = new VertexNormalsHelper(this.mesh, 1, 0xa4036f);
     this.group.add(this.mesh);
     this.group.add(this.normals);
