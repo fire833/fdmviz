@@ -9,7 +9,7 @@
     layerHeight,
     orbit,
   } from '../stores';
-  import { ViewMode } from '../types';
+  import { get } from 'svelte/store';
 
   let container: HTMLElement;
   let sim = new Simulator();
@@ -28,6 +28,7 @@
   });
 
   viewMode.subscribe((value) => {
+    sim.uploadMesh(get(fileURL));
     sim.updateMeshMaterial();
     sim.resetPhysics();
   });

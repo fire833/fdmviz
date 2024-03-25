@@ -21,15 +21,14 @@
     { label: 'Raw 3D File', id: 'raw', value: ViewMode.RAW_STL },
     { label: 'Fragment Shader', id: 'shader', value: ViewMode.SHADER },
     {
-      label: 'Particle Simulation',
+      label: 'Fluid Simulation',
       id: 'particle',
-      value: ViewMode.PARTICLE_SIM,
+      value: ViewMode.SIMULATION,
     },
     {
-      label: 'Normal Map',
+      label: 'Texture Map',
       id: 'normal',
-      value: ViewMode.NORMAL_MAP,
-      disabled: true,
+      value: ViewMode.TEXTURE,
     },
   ];
 </script>
@@ -51,7 +50,6 @@
           name="viewMode"
           value={mode.value}
           bind:group={$viewMode}
-          disabled={mode.disabled}
         />
         <label for={mode.id}>{mode.label}</label>
       </div>

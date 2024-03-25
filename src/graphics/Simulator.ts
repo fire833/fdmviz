@@ -8,11 +8,13 @@ import {
   LineSegments,
   Mesh,
   MeshNormalMaterial,
+  MeshPhysicalMaterial,
   MeshStandardMaterial,
   PerspectiveCamera,
   RawShaderMaterial,
   Scene,
   Sphere,
+  TextureLoader,
   Vector3,
   WebGLRenderer,
 } from 'three';
@@ -20,6 +22,10 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 
+import {
+  mergeVertices,
+  toCreasedNormals,
+} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import layerFrag from '../graphics/layerShader.frag';
 import layerVert from '../graphics/layerShader.vert';
 import {
@@ -31,6 +37,7 @@ import {
   viewMode,
 } from '../stores';
 import { ViewMode } from '../types';
+import { generateUVs } from './NormalMap';
 import { PhysicsObject } from './PhysicsObject';
 
 export default class Simulator {
@@ -127,6 +134,29 @@ export default class Simulator {
       return;
     }
 
+    if (get(viewMode) == ViewMode.TEXTURE) {
+      var geometry = this.mesh.geometry;
+
+      geometry = toCreasedNormals(geometry, Math.PI / 3);
+      geometry = mergeVertices(geometry);
+      geometry.computeVertexNormals();
+      // Turn on standard material with normal map
+
+      const normalTexture = new TextureLoader().load('/denim.jpg');
+      normalTexture.repeat;
+      generateUVs(this.mesh);
+
+      this.mesh.material = new MeshPhysicalMaterial({
+        color: materialColor,
+        roughness: 0.2,
+        normalMap: normalTexture,
+        displacementMap: normalTexture,
+        displacementScale: 0.2,
+        displacementBias: -0.1,
+      });
+      return;
+    }
+
     // Default, turn on standard material
     this.mesh.material = new MeshStandardMaterial({
       color: materialColor,
@@ -187,7 +217,7 @@ export default class Simulator {
   }
 
   public resetPhysics() {
-    if (get(viewMode) == ViewMode.PARTICLE_SIM) {
+    if (get(viewMode) == ViewMode.SIMULATION) {
       this.clock = new Clock();
       this.group.position.y = 0;
       this.group.v = new Vector3(0, 10, 0);
@@ -203,7 +233,7 @@ export default class Simulator {
     // Update view based on controls (mouse)
     this.controls.update();
     // Update the physics model
-    if (get(viewMode) == ViewMode.PARTICLE_SIM) {
+    if (get(viewMode) == ViewMode.SIMULATION) {
       this.updatePhysics(this.clock.getDelta() * this.simSpeed);
     }
   }

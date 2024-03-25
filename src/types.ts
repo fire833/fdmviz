@@ -1,8 +1,8 @@
 export enum ViewMode {
   RAW_STL,
   SHADER,
-  PARTICLE_SIM,
-  NORMAL_MAP,
+  SIMULATION,
+  TEXTURE,
 }
 
 // TODO: Unused interface
