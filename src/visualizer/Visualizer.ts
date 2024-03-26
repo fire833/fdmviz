@@ -234,12 +234,10 @@ export default class Visualizer {
   }
 
   public resetPhysics() {
-    if (get(viewMode) == ViewMode.SIMULATION) {
-      this.clock = new Clock();
-      this.group.position.y = 0;
-      this.group.v = new Vector3(0, 10, 0);
-      this.group.a = new Vector3(0, -10, 0); // Accelerate downwards
-    }
+    this.clock = new Clock();
+    this.group.position.y = 0;
+    this.group.v = new Vector3(0, 10, 0);
+    this.group.a = new Vector3(0, -10, 0); // Accelerate downwards
   }
 
   public updatePhysics(delta: number) {
