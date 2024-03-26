@@ -13,6 +13,7 @@ export const temperature = writable<number>(150); // °C
 export const orbit = writable<boolean>(true);
 export const showVertexNormals = writable<boolean>(false);
 export const showSurfaceNormals = writable<boolean>(false);
+export const smoothGeometry = writable<boolean>(false);
 export const meltyParticles = writable<boolean>(false);
 export const shakyBed = writable<boolean>(false);
 export const wetFilament = writable<boolean>(false);

@@ -13,6 +13,7 @@
     thermalTransfer,
     showSurfaceNormals,
     orbit,
+    smoothGeometry,
   } from '../stores';
 
   const dispatchModalEvent = createEventDispatcher();
@@ -110,6 +111,14 @@
         bind:checked={$showSurfaceNormals}
       />
       <label for="surfaceNormals">Show Surface Normals</label>
+    </div>
+    <div class="left">
+      <input
+        type="checkbox"
+        id="smoothGeometry"
+        bind:checked={$smoothGeometry}
+      />
+      <label for="smoothGeometry">Smooth Geometry</label>
     </div>
     <div class="left">
       <input

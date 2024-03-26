@@ -31,10 +31,15 @@ import {
   showSurfaceNormals,
   showVertexNormals,
   simSpeed,
+  smoothGeometry,
   viewMode,
 } from '../stores';
 import { ViewMode } from '../types';
 
+import {
+  mergeVertices,
+  toCreasedNormals,
+} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import layerFrag from './shaders/layerShader.frag';
 import layerVert from './shaders/layerShader.vert';
 import { PhysicsObject } from './simulation/PhysicsObject';
@@ -125,6 +130,11 @@ export default class Visualizer {
     });
 
     showSurfaceNormals.subscribe(() => this.updateMeshMaterial());
+
+    smoothGeometry.subscribe(() => {
+      this.uploadMesh(get(fileURL));
+      this.resetPhysics();
+    });
   }
 
   public updateMeshMaterial() {
@@ -180,11 +190,11 @@ export default class Visualizer {
   public populateObject(geometry: BufferGeometry) {
     geometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
     this.mesh = new Mesh(geometry, undefined);
-    // if (get(viewMode) == ViewMode.TEXTURE) { TODO: Make this a user option
-    //   geometry = toCreasedNormals(geometry, Math.PI / 3);
-    //   geometry = mergeVertices(geometry);
-    //   geometry.computeVertexNormals();
-    // }
+    if (get(smoothGeometry)) {
+      geometry = toCreasedNormals(geometry, Math.PI / 3);
+      geometry = mergeVertices(geometry);
+      geometry.computeVertexNormals();
+    }
     this.normals = new VertexNormalsHelper(this.mesh, 1, 0xa4036f);
     this.group.add(this.mesh);
     this.group.add(this.normals);
