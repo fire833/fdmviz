@@ -136,7 +136,6 @@ export default class Visualizer {
 
     smoothGeometry.subscribe(() => {
       this.uploadMesh(get(fileURL));
-      this.resetPhysics();
     });
   }
 
