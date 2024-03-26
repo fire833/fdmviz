@@ -1,4 +1,14 @@
-import { BufferAttribute, Mesh, Vector3 } from 'three';
+import { get } from 'svelte/store';
+import {
+  BufferAttribute,
+  Mesh,
+  RepeatWrapping,
+  Texture,
+  TextureLoader,
+  Vector2,
+  Vector3,
+} from 'three';
+import { layerHeight } from '../../stores';
 
 // Spherical UV projection
 export function generateUVs(mesh: Mesh): void {
@@ -29,4 +39,17 @@ export function generateUVs(mesh: Mesh): void {
   // Mark UVs as updated
   mesh.geometry.setAttribute('uv', uvAttribute);
   uvAttribute.needsUpdate = true;
+}
+
+export function getNormalMap(): Texture {
+  // Load the image
+  const normalTexture = new TextureLoader().load('alan_warburton.png');
+
+  // Configure the texture
+  const scale = get(layerHeight) * 2;
+  normalTexture.repeat = new Vector2(1 / scale, 1 / scale);
+  normalTexture.wrapS = RepeatWrapping;
+  normalTexture.wrapT = RepeatWrapping;
+
+  return normalTexture;
 }

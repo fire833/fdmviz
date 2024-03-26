@@ -12,10 +12,8 @@ import {
   MeshStandardMaterial,
   PerspectiveCamera,
   RawShaderMaterial,
-  RepeatWrapping,
   Scene,
   Sphere,
-  TextureLoader,
   Vector2,
   Vector3,
   WebGLRenderer,
@@ -43,7 +41,7 @@ import {
 import layerFrag from './shaders/layerShader.frag';
 import layerVert from './shaders/layerShader.vert';
 import { PhysicsObject } from './simulation/PhysicsObject';
-import { generateUVs } from './textures/NormalMap';
+import { generateUVs, getNormalMap } from './textures/NormalMap';
 
 export default class Visualizer {
   private webgl: WebGLRenderer;
@@ -164,17 +162,12 @@ export default class Visualizer {
 
     if (get(viewMode) == ViewMode.TEXTURE) {
       // Turn on standard material with normal map
-      const normalTexture = new TextureLoader().load('alan_warburton.png');
-      const scale = get(layerHeight) * 2;
-      normalTexture.repeat = new Vector2(1 / scale, 1 / scale);
-      normalTexture.wrapS = RepeatWrapping;
-      normalTexture.wrapT = RepeatWrapping;
       generateUVs(this.mesh);
 
       this.mesh.material = new MeshPhysicalMaterial({
         color: materialColor,
         roughness: 0.4,
-        normalMap: normalTexture,
+        normalMap: getNormalMap(),
         normalScale: new Vector2(0.6, 0.01),
       });
       return;
