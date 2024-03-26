@@ -134,8 +134,8 @@ export default class Visualizer {
 
     showSurfaceNormals.subscribe(() => this.updateMeshMaterial());
 
-    smoothGeometry.subscribe(() => {
-      this.uploadMesh(get(fileURL));
+    smoothGeometry.subscribe((value) => {
+      this.uploadMesh(get(fileURL), value);
     });
   }
 
@@ -187,10 +187,10 @@ export default class Visualizer {
     });
   }
 
-  public populateObject(geometry: BufferGeometry) {
+  public populateObject(geometry: BufferGeometry, smoothGeometry: boolean) {
     geometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
     this.mesh = new Mesh(geometry, undefined);
-    if (get(smoothGeometry)) {
+    if (smoothGeometry) {
       geometry = toCreasedNormals(geometry, Math.PI / 3);
       geometry = mergeVertices(geometry);
       geometry.computeVertexNormals();
@@ -205,14 +205,17 @@ export default class Visualizer {
   // Upload the mesh being displayed based on a certain fileURL
   //
   // utah_teapot.stl
-  public async uploadMesh(fileURL: string = 'utah_teapot.stl') {
+  public async uploadMesh(
+    fileURL: string = 'utah_teapot.stl',
+    doSmoothGeometry: boolean = get(smoothGeometry),
+  ) {
     // Remove previous mesh
     this.group.clear();
 
     // Load STL
     const loader = new STLLoader();
     let geometry: BufferGeometry = await loader.loadAsync(fileURL);
-    this.populateObject(geometry);
+    this.populateObject(geometry, doSmoothGeometry);
   }
 
   // Rescale the camera to fit and be centered on the mesh
