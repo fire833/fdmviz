@@ -1,4 +1,4 @@
-import { BufferAttribute, Mesh } from 'three';
+import { BufferAttribute, Mesh, Vector3 } from 'three';
 
 export function generateUVs(mesh: Mesh): void {
   const posAttribute = mesh.geometry.getAttribute('position');
@@ -9,20 +9,17 @@ export function generateUVs(mesh: Mesh): void {
 
   mesh.geometry.computeBoundingSphere();
   if (!mesh.geometry.boundingSphere) return;
-
   const radius: number = mesh.geometry.boundingSphere.radius;
-  const centerX: number = mesh.geometry.boundingSphere.center.x;
-  const centerZ: number = mesh.geometry.boundingSphere.center.z;
+  const center: Vector3 = mesh.geometry.boundingSphere.center;
 
-  // Set UVs
-  console.log(posAttribute.count);
+  // Calculate UVs
   for (let i = 0; i < posAttribute.count; i++) {
-    const offsetX = centerX - posAttribute.getX(i);
-    const offsetZ = centerZ - posAttribute.getZ(i);
-    const angle = Math.atan2(offsetZ, offsetX); // Angle in radians
+    const offsetX = (posAttribute.getX(i) - center.x) / radius;
+    const offsetY = (posAttribute.getY(i) - center.y) / radius;
+    const offsetZ = (posAttribute.getZ(i) - center.z) / radius;
 
-    const u = (angle + Math.PI) / (2 * Math.PI);
-    const v = Math.asin(posAttribute.getY(i) / (2 * radius));
+    const u = 0.5 + Math.atan2(offsetZ, offsetX) / (2 * Math.PI);
+    const v = 0.5 + Math.asin(offsetY) / Math.PI;
 
     // Modify u and v as needed
     uvAttribute.setXY(i, u, v);

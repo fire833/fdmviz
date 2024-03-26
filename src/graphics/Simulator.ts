@@ -12,6 +12,7 @@ import {
   MeshStandardMaterial,
   PerspectiveCamera,
   RawShaderMaterial,
+  RepeatWrapping,
   Scene,
   Sphere,
   TextureLoader,
@@ -138,18 +139,17 @@ export default class Simulator {
     if (get(viewMode) == ViewMode.TEXTURE) {
       // Turn on standard material with normal map
       const normalTexture = new TextureLoader().load('alan_warburton.png');
-      const scale = Math.pow(2, get(layerHeight));
-      normalTexture.repeat = new Vector2(1, scale);
+      const scale = get(layerHeight) * 2;
+      normalTexture.repeat = new Vector2(1 / scale, 1 / scale);
+      normalTexture.wrapS = RepeatWrapping;
+      normalTexture.wrapT = RepeatWrapping;
       generateUVs(this.mesh);
 
       this.mesh.material = new MeshPhysicalMaterial({
         color: materialColor,
-        roughness: 0.2,
+        roughness: 0.4,
         normalMap: normalTexture,
-        normalScale: new Vector2(0.7, 0.7),
-        displacementMap: normalTexture,
-        displacementScale: 0.2,
-        displacementBias: -0.1,
+        normalScale: new Vector2(0.6, 0.01),
       });
       return;
     }
