@@ -1,5 +1,6 @@
 import { BufferAttribute, Mesh, Vector3 } from 'three';
 
+// Spherical UV projection
 export function generateUVs(mesh: Mesh): void {
   const posAttribute = mesh.geometry.getAttribute('position');
   const uvAttribute = new BufferAttribute(

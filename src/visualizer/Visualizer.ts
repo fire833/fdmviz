@@ -25,12 +25,7 @@ import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHel
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 
 import {
-  mergeVertices,
-  toCreasedNormals,
-} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import layerFrag from '../graphics/layerShader.frag';
-import layerVert from '../graphics/layerShader.vert';
-import {
+  fileURL,
   layerHeight,
   orbit,
   showSurfaceNormals,
@@ -39,10 +34,13 @@ import {
   viewMode,
 } from '../stores';
 import { ViewMode } from '../types';
-import { generateUVs } from './NormalMap';
-import { PhysicsObject } from './PhysicsObject';
 
-export default class Simulator {
+import layerFrag from './shaders/layerShader.frag';
+import layerVert from './shaders/layerShader.vert';
+import { PhysicsObject } from './simulation/PhysicsObject';
+import { generateUVs } from './textures/NormalMap';
+
+export default class Visualizer {
   private webgl: WebGLRenderer;
   private camera: PerspectiveCamera;
   private controls: OrbitControls;
@@ -100,15 +98,33 @@ export default class Simulator {
     this.controls = new OrbitControls(this.camera, this.webgl.domElement);
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.3;
-    this.setOrbitCamera(get(orbit));
+    this.controls.autoRotate = get(orbit);
+    this.createSubscriptions();
   }
 
-  public setOrbitCamera(set: boolean) {
-    this.controls.autoRotate = set;
-  }
+  // Subscribe to user settings to update simulator
+  public createSubscriptions() {
+    fileURL.subscribe((value: string) => {
+      this.uploadMesh(value);
+      this.resetPhysics();
+    });
 
-  public setVertexNormals(show: boolean) {
-    if (this.normals) this.normals.visible = show;
+    viewMode.subscribe(() => {
+      this.updateMeshMaterial();
+      this.resetPhysics();
+    });
+
+    layerHeight.subscribe(() => this.updateMeshMaterial());
+
+    orbit.subscribe((value: boolean) => {
+      this.controls.autoRotate = value;
+    });
+
+    showVertexNormals.subscribe((value: boolean) => {
+      if (this.normals) this.normals.visible = value;
+    });
+
+    showSurfaceNormals.subscribe(() => this.updateMeshMaterial());
   }
 
   public updateMeshMaterial() {
@@ -164,15 +180,15 @@ export default class Simulator {
   public populateObject(geometry: BufferGeometry) {
     geometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
     this.mesh = new Mesh(geometry, undefined);
-    if (get(viewMode) == ViewMode.TEXTURE) {
-      geometry = toCreasedNormals(geometry, Math.PI / 3);
-      geometry = mergeVertices(geometry);
-      geometry.computeVertexNormals();
-    }
+    // if (get(viewMode) == ViewMode.TEXTURE) { TODO: Make this a user option
+    //   geometry = toCreasedNormals(geometry, Math.PI / 3);
+    //   geometry = mergeVertices(geometry);
+    //   geometry.computeVertexNormals();
+    // }
     this.normals = new VertexNormalsHelper(this.mesh, 1, 0xa4036f);
     this.group.add(this.mesh);
     this.group.add(this.normals);
-    this.setVertexNormals(get(showVertexNormals));
+    if (this.normals) this.normals.visible = get(showVertexNormals);
     this.updateMeshMaterial();
     this.rescaleCamera(this.mesh);
   }
