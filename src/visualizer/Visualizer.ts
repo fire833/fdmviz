@@ -54,8 +54,8 @@ export default class Visualizer {
   private scene: Scene;
   private clock: Clock; // Timer for physics/animations
   private group: PhysicsObject; // Holds the mesh and normals
-  private mesh: Mesh | undefined;
-  private normals: LineSegments | undefined;
+  private mesh: Mesh;
+  private normals: LineSegments;
   private simSpeed: number;
 
   constructor() {
@@ -69,6 +69,8 @@ export default class Visualizer {
     // Set up scene
     this.scene = new Scene();
     this.clock = new Clock(); // Autostart on first call
+    this.mesh = new Mesh();
+    this.normals = new LineSegments();
 
     this.simSpeed = get(simSpeed);
     simSpeed.subscribe((value) => {
@@ -109,9 +111,10 @@ export default class Visualizer {
 
   // Subscribe to user settings to update simulator
   public createSubscriptions() {
-    fileURL.subscribe((value: string) => {
-      this.uploadMesh(value);
+    fileURL.subscribe(async (value: string) => {
+      await this.uploadMesh(value);
       this.resetPhysics();
+      this.rescaleCamera();
     });
 
     viewMode.subscribe(() => {
@@ -138,8 +141,6 @@ export default class Visualizer {
   }
 
   public updateMeshMaterial() {
-    if (!this.mesh) return;
-
     if (get(showSurfaceNormals)) {
       // Turn on normal material
       this.mesh.material = new MeshNormalMaterial();
@@ -200,36 +201,24 @@ export default class Visualizer {
     this.group.add(this.normals);
     if (this.normals) this.normals.visible = get(showVertexNormals);
     this.updateMeshMaterial();
-    this.rescaleCamera(this.mesh);
   }
 
   // Upload the mesh being displayed based on a certain fileURL
   //
   // utah_teapot.stl
-  public uploadMesh(fileURL: string = 'utah_teapot.stl') {
+  public async uploadMesh(fileURL: string = 'utah_teapot.stl') {
     // Remove previous mesh
     this.group.clear();
 
     // Load STL
     const loader = new STLLoader();
-    loader.load(
-      fileURL,
-      (geometry: BufferGeometry) => {
-        this.populateObject(geometry);
-      },
-      (xhr) => {
-        console.log(
-          'Loading object: ' + (xhr.loaded / xhr.total) * 100 + '% loaded',
-        );
-      },
-      (error) => {
-        console.log(error);
-      },
-    );
+    let geometry: BufferGeometry = await loader.loadAsync(fileURL);
+    this.populateObject(geometry);
   }
 
   // Rescale the camera to fit and be centered on the mesh
-  public rescaleCamera(mesh: Mesh) {
+  public rescaleCamera() {
+    const mesh = this.mesh;
     // Compute the bounding sphere
     mesh.geometry.computeBoundingSphere();
     if (!mesh.geometry.boundingSphere) return;
