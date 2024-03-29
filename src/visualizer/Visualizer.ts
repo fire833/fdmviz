@@ -140,7 +140,7 @@ export default class Visualizer {
     });
   }
 
-  public updateMeshMaterial() {
+  public async updateMeshMaterial() {
     if (get(showSurfaceNormals)) {
       // Turn on normal material
       this.mesh.material = new MeshNormalMaterial();
@@ -154,7 +154,7 @@ export default class Visualizer {
       this.mesh.material = new MeshPhysicalMaterial({
         color: new Color('white'),
         roughness: 0.4,
-        map: getUVMap(),
+        map: await getUVMap(),
       });
       return;
     }
@@ -182,7 +182,7 @@ export default class Visualizer {
       this.mesh.material = new MeshPhysicalMaterial({
         color: materialColor,
         roughness: 0.4,
-        normalMap: getNormalMap(),
+        normalMap: await getNormalMap(),
         normalScale: new Vector2(0.6, 0.01),
       });
       return;

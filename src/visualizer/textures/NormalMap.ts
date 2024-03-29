@@ -41,9 +41,11 @@ export function generateUVs(mesh: Mesh): void {
   uvAttribute.needsUpdate = true;
 }
 
-export function getNormalMap(): Texture {
+export async function getNormalMap(): Promise<Texture> {
   // Load the image
-  const normalTexture = new TextureLoader().load('alan_warburton.png');
+  const normalTexture = await new TextureLoader().loadAsync(
+    'alan_warburton.png',
+  );
 
   // Configure the texture
   const scale = get(layerHeight) * 2;
@@ -54,7 +56,7 @@ export function getNormalMap(): Texture {
   return normalTexture;
 }
 
-export function getUVMap(): Texture {
+export async function getUVMap(): Promise<Texture> {
   // Load the image
-  return new TextureLoader().load('uv_checker.png');
+  return new TextureLoader().loadAsync('uv_checker.png');
 }
