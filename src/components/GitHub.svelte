@@ -1,4 +1,4 @@
-<a href="https://github.com/fire833/fdmviz">
+<a href="https://github.com/fire833/fdmviz" title="GitHub Repository">
   <svg
     width="1em"
     height="1em"
