@@ -27,6 +27,7 @@ import {
   layerHeight,
   orbit,
   showSurfaceNormals,
+  showSurfaceUVs,
   showVertexNormals,
   simSpeed,
   smoothGeometry,
@@ -41,7 +42,7 @@ import {
 import layerFrag from './shaders/layerShader.frag';
 import layerVert from './shaders/layerShader.vert';
 import { PhysicsObject } from './simulation/PhysicsObject';
-import { generateUVs, getNormalMap } from './textures/NormalMap';
+import { generateUVs, getNormalMap, getUVMap } from './textures/NormalMap';
 
 export default class Visualizer {
   private webgl: WebGLRenderer;
@@ -132,6 +133,8 @@ export default class Visualizer {
 
     showSurfaceNormals.subscribe(() => this.updateMeshMaterial());
 
+    showSurfaceUVs.subscribe(() => this.updateMeshMaterial());
+
     smoothGeometry.subscribe((value) => {
       this.uploadMesh(get(fileURL), value);
     });
@@ -141,6 +144,18 @@ export default class Visualizer {
     if (get(showSurfaceNormals)) {
       // Turn on normal material
       this.mesh.material = new MeshNormalMaterial();
+      return;
+    }
+
+    if (get(showSurfaceUVs)) {
+      // Turn on UV material
+      generateUVs(this.mesh);
+
+      this.mesh.material = new MeshPhysicalMaterial({
+        color: new Color('white'),
+        roughness: 0.4,
+        map: getUVMap(),
+      });
       return;
     }
 

@@ -14,6 +14,7 @@
     showSurfaceNormals,
     orbit,
     smoothGeometry,
+    showSurfaceUVs,
   } from '../stores';
 
   const dispatchModalEvent = createEventDispatcher();
@@ -111,6 +112,10 @@
         bind:checked={$showSurfaceNormals}
       />
       <label for="surfaceNormals">Show Surface Normals</label>
+    </div>
+    <div class="left">
+      <input type="checkbox" id="surfaceUVs" bind:checked={$showSurfaceUVs} />
+      <label for="surfaceUVs">Show Surface UVs</label>
     </div>
     <div class="left">
       <input

@@ -53,3 +53,8 @@ export function getNormalMap(): Texture {
 
   return normalTexture;
 }
+
+export function getUVMap(): Texture {
+  // Load the image
+  return new TextureLoader().load('uv_checker.png');
+}
