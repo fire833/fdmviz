@@ -199,7 +199,7 @@ export default class Visualizer {
     geometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
     this.mesh = new Mesh(geometry, undefined);
     if (smoothGeometry) {
-      geometry = toCreasedNormals(geometry, Math.PI / 3);
+      geometry = toCreasedNormals(geometry, Math.PI / 5);
       geometry = mergeVertices(geometry);
       geometry.computeVertexNormals();
     }
