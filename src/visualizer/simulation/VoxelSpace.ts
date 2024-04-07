@@ -1,18 +1,8 @@
 export default class VoxelSpace {
-  points: Array<Array<Array<Voxel>>>;
+  // The list of lattice points that are populated with volume.
+  points: Map<[number, number, number], Voxel> = new Map();
 
-  constructor(sizex: number, sizey: number, sizez: number) {
-    this.points = new Array(sizex);
-    for (let x = 0; x < sizex; x++) {
-      this.points[x] = new Array(sizey);
-      for (let y = 0; y < sizey; y++) {
-        this.points[x][y] = new Array(sizez);
-        for (let z = 0; z < sizez; z++) {
-          this.points[x][y][z] = new Voxel(y);
-        }
-      }
-    }
-  }
+  constructor() {}
 }
 
 export class Voxel {
