@@ -46,10 +46,57 @@ import { PhysicsObject } from './simulation/PhysicsObject';
 import VoxelSpace from './simulation/VoxelSpace';
 import { generateUVs, getNormalMap, getUVMap } from './textures/NormalMap';
 
+import * as THREE from 'three';
+import { marchingCubes, metaBalls } from './simulation/MarchingCubes';
+
+let container;
+
+let time = 0;
+
+const clock = new THREE.Clock();
+
+// BUFFER GEOMETRY
+
+const maxPolygons = 30000;
+const vertices = Array(3 * maxPolygons).fill(0);
+
+const meshBufferGeometry = new THREE.BufferGeometry();
+const buffer = new THREE.Float32BufferAttribute(vertices, 3);
+buffer.setUsage(THREE.DynamicDrawUsage);
+meshBufferGeometry.setAttribute('position', buffer);
+
+const mesh2 = new THREE.Mesh(
+  meshBufferGeometry,
+  new THREE.MeshPhongMaterial({ color: 0xffffff }),
+);
+mesh2.castShadow = true;
+mesh2.receiveShadow = true;
+
+function updateMesh(trianglePoints: THREE.Vector3[]) {
+  for (let i = 0; i < trianglePoints.length; i++) {
+    const x = trianglePoints[i].x;
+    const y = trianglePoints[i].y;
+    const z = trianglePoints[i].z;
+
+    vertices[i * 3] = x;
+    vertices[i * 3 + 1] = y;
+    vertices[i * 3 + 2] = z;
+  }
+  const positionAttribute = new THREE.Float32BufferAttribute(vertices, 3);
+  positionAttribute.setUsage(THREE.DynamicDrawUsage);
+  meshBufferGeometry.setAttribute('position', positionAttribute);
+  meshBufferGeometry.setDrawRange(0, trianglePoints.length);
+  meshBufferGeometry.computeVertexNormals();
+  meshBufferGeometry.getAttribute('position').needsUpdate = true;
+  meshBufferGeometry.getAttribute('normal').needsUpdate = true;
+}
+
 export default class Visualizer {
   private webgl: WebGLRenderer;
   private camera: PerspectiveCamera;
   private controls: OrbitControls;
+
+  container = document.getElementById('container');
 
   // Scene state
   private scene: Scene;
@@ -59,6 +106,8 @@ export default class Visualizer {
   private mesh: Mesh;
   private normals: LineSegments;
   private simSpeed: number;
+
+  public vertex = new THREE.Vector3();
 
   constructor() {
     // Set up renderer
@@ -93,7 +142,10 @@ export default class Visualizer {
 
     // Initialize the group containing the mesh
     this.group = new PhysicsObject();
-    this.scene.add(this.group);
+
+    //Comment next line and uncomment line after to get marchiing cubes by itself
+    //this.scene.add(this.group);
+    this.scene.add(mesh2);
 
     // Set up camera
     this.camera = new PerspectiveCamera(
@@ -150,7 +202,7 @@ export default class Visualizer {
     layerHeight.subscribe(() => this.updateMeshMaterial());
 
     orbit.subscribe((value: boolean) => {
-      this.controls.autoRotate = value;
+      this.controls.autoRotate = false; //value;
     });
 
     showVertexNormals.subscribe((value: boolean) => {
@@ -211,6 +263,12 @@ export default class Visualizer {
         normalMap: await getNormalMap(),
         normalScale: new Vector2(0.6, 0.01),
       });
+
+      return;
+    }
+    if (get(viewMode) == ViewMode.SIMULATION) {
+      //Turn on Marching cubes
+
       return;
     }
 
@@ -232,6 +290,7 @@ export default class Visualizer {
     this.normals = new VertexNormalsHelper(this.mesh, 1, 0xa4036f);
     this.group.add(this.mesh);
     this.group.add(this.normals);
+
     if (this.normals) this.normals.visible = get(showVertexNormals);
     this.updateMeshMaterial();
   }
@@ -289,7 +348,17 @@ export default class Visualizer {
     this.controls.update();
     // Update the physics model
     if (get(viewMode) == ViewMode.SIMULATION) {
-      this.updatePhysics(this.clock.getDelta() * this.simSpeed);
+      //Simulate the object in marching cubes
+      const delta = this.clock.getDelta();
+
+      time += delta * this.simSpeed * 0.5;
+
+      metaBalls[0].center.x = Math.sin(time) * 2;
+      metaBalls[0].center.y = Math.cos(time) * 2;
+
+      // marching cubes 2
+      const triangles = marchingCubes();
+      updateMesh(triangles);
     }
   }
 
