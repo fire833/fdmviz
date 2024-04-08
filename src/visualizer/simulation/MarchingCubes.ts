@@ -4,7 +4,7 @@ import { edgeTable, triTable } from './LookUpTable';
 const resolution = 40;
 const scale = 10;
 
-const isolevel = 0.25;
+const isolevel = 0.5;
 
 let values: number[] = [];
 let points: THREE.Vector3[] = [];
@@ -28,9 +28,11 @@ metaBalls.push({ center: new THREE.Vector3(2, 0, 0), radius: 0.5 });
 metaBalls.push({ center: new THREE.Vector3(2, 0, -2), radius: 0.25 });
 
 export function marchingCubes() {
+  //Pass in map of values from the geometry
   for (let i = 0; i < values.length; i++) {
     values[i] = 0;
   }
+
   // meta balls
   for (const metaBall of metaBalls) {
     for (let i = 0; i < points.length; i++) {
@@ -42,8 +44,10 @@ export function marchingCubes() {
   //Adds floor (Created by yours truly CMATT)
   for (let i = 0; i < points.length; i++) {
     // meta ball function
-    values[i] += Math.exp(-points[i].y - 5);
+    values[i] += Math.exp(-points[i].y - 4.3);
   }
+
+  //Add "Rule" here changing the value of each point given the list passed in
 
   // approximated intersection points
   var vlist = new Array(12);
