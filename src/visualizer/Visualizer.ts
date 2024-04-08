@@ -141,8 +141,7 @@ export default class Visualizer {
     this.group = new PhysicsObject();
 
     //Comment next line and uncomment line after to get marchiing cubes by itself
-    //this.scene.add(this.group);
-    this.scene.add(mesh2);
+    this.scene.add(this.group);
 
     // Set up camera
     this.camera = new PerspectiveCamera(
@@ -176,7 +175,7 @@ export default class Visualizer {
     layerHeight.subscribe(() => this.updateMeshMaterial());
 
     orbit.subscribe((value: boolean) => {
-      this.controls.autoRotate = false; //value;
+      this.controls.autoRotate = value;
     });
 
     showVertexNormals.subscribe((value: boolean) => {
@@ -242,6 +241,8 @@ export default class Visualizer {
     }
     if (get(viewMode) == ViewMode.SIMULATION) {
       //Turn on Marching cubes
+      this.group.clear();
+      this.group.add(mesh2);
 
       return;
     }
