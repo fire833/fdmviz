@@ -7,6 +7,8 @@ export const openModal = writable<boolean>(false);
 export const fileURL = writable<string>();
 // Store for the current viewMode, should affect viewport.
 export const viewMode = writable<ViewMode>(ViewMode.RAW_STL);
+// Loading
+export const loadingMessages = writable<Array<String>>(new Array<String>());
 // Parameters
 export const layerHeight = writable<number>(0.2); // mm
 export const simSpeed = writable<number>(1); // factor

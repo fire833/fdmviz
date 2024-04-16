@@ -8,6 +8,7 @@ import {
   Vector2,
   Vector3,
 } from 'three';
+import { clearLoading, startLoading } from '../../displayLoading';
 import { layerHeight } from '../../stores';
 
 // Spherical UV projection
@@ -43,9 +44,14 @@ export function generateUVs(mesh: Mesh): void {
 
 export async function getNormalMap(): Promise<Texture> {
   // Load the image
-  const normalTexture = await new TextureLoader().loadAsync(
-    'alan_warburton.png',
-  );
+  let normalTexture: Texture;
+
+  let loadingMessage = 'Loading 3D Printed Texture';
+
+  startLoading(loadingMessage);
+  let loader = new TextureLoader().loadAsync('alan_warburton.png');
+  normalTexture = await loader;
+  clearLoading(loadingMessage);
 
   // Configure the texture
   const scale = get(layerHeight) * 2;
