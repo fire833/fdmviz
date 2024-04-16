@@ -3,7 +3,9 @@ import { ViewMode } from './types';
 
 export const openModal = writable<boolean>(false);
 
+// Store for the FileURL
 export const fileURL = writable<string>();
+// Store for the current viewMode, should affect viewport.
 export const viewMode = writable<ViewMode>(ViewMode.RAW_STL);
 // Parameters
 export const layerHeight = writable<number>(0.2); // mm

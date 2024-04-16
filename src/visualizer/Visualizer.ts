@@ -42,6 +42,7 @@ import {
 import layerFrag from './shaders/layerShader.frag';
 import layerVert from './shaders/layerShader.vert';
 import { PhysicsObject } from './simulation/PhysicsObject';
+import VoxelSpace from './simulation/VoxelSpace';
 import { generateUVs, getNormalMap, getUVMap } from './textures/NormalMap';
 
 export default class Visualizer {
@@ -53,6 +54,7 @@ export default class Visualizer {
   private scene: Scene;
   private clock: Clock; // Timer for physics/animations
   private group: PhysicsObject; // Holds the mesh and normals
+  private voxelspace: VoxelSpace | undefined;
   private mesh: Mesh;
   private normals: LineSegments;
   private simSpeed: number;
@@ -116,9 +118,32 @@ export default class Visualizer {
       this.rescaleCamera();
     });
 
-    viewMode.subscribe(() => {
+    viewMode.subscribe((mode: ViewMode) => {
+      // Update our material regardless of the mode we are in.
+      // We want the visualizer to be consistent with app state always.
       this.updateMeshMaterial();
-      this.resetPhysics();
+      switch (mode) {
+        case ViewMode.RAW_STL: {
+          break;
+        }
+        case ViewMode.SHADER: {
+          break;
+        }
+        case ViewMode.SIMULATION: {
+          // If we are undefined.
+          // TODO: get rendering of voxzelspace working, and reduce the compute time for generating the voxel.
+          // if (this.voxelspace === undefined)
+          //   this.voxelspace = new VoxelSpace(50, 50, 50, this.mesh);
+
+          // console.log(this.voxelspace.getSpace());
+
+          this.resetPhysics();
+          break;
+        }
+        case ViewMode.TEXTURE: {
+          break;
+        }
+      }
     });
 
     layerHeight.subscribe(() => this.updateMeshMaterial());
