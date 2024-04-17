@@ -5,6 +5,7 @@ import {
   Clock,
   Color,
   DirectionalLight,
+  Group,
   LineSegments,
   Mesh,
   MeshNormalMaterial,
@@ -19,7 +20,6 @@ import {
   WebGLRenderer,
 } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 
 import {
@@ -42,20 +42,25 @@ import {
 import { clearLoading, startLoading } from '../displayLoading';
 import layerFrag from './shaders/layerShader.frag';
 import layerVert from './shaders/layerShader.vert';
-import { PhysicsObject } from './simulation/PhysicsObject';
-import VoxelSpace from './simulation/VoxelSpace';
 import { generateUVs, getNormalMap, getUVMap } from './textures/NormalMap';
+
+import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js';
+import Simulator from './simulation/Simulator';
 
 export default class Visualizer {
   private webgl: WebGLRenderer;
   private camera: PerspectiveCamera;
   private controls: OrbitControls;
 
+  container = document.getElementById('container');
+
   // Scene state
+  private simulator: Simulator;
+
+  private baseGeometry: BufferGeometry;
   private scene: Scene;
   private clock: Clock; // Timer for physics/animations
-  private group: PhysicsObject; // Holds the mesh and normals
-  private voxelspace: VoxelSpace | undefined;
+  private group: Group; // Holds the mesh and normals
   private mesh: Mesh;
   private normals: LineSegments;
   private simSpeed: number;
@@ -69,15 +74,13 @@ export default class Visualizer {
     }); // Rerender the scene on every frame
 
     // Set up scene
+    this.baseGeometry = new BufferGeometry();
     this.scene = new Scene();
     this.clock = new Clock(); // Autostart on first call
     this.mesh = new Mesh();
     this.normals = new LineSegments();
 
     this.simSpeed = get(simSpeed);
-    simSpeed.subscribe((value) => {
-      this.simSpeed = value;
-    });
 
     // Add some lights
     const ambientLight = new AmbientLight(0xffffff, 0.5);
@@ -92,7 +95,9 @@ export default class Visualizer {
     this.scene.add(directLight2);
 
     // Initialize the group containing the mesh
-    this.group = new PhysicsObject();
+    this.group = new Group();
+
+    //Comment next line and uncomment line after to get marchiing cubes by itself
     this.scene.add(this.group);
 
     // Set up camera
@@ -108,43 +113,39 @@ export default class Visualizer {
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.3;
     this.controls.autoRotate = get(orbit);
-    this.createSubscriptions();
+    this.simulator = new Simulator(this.baseGeometry);
+
+    this.loadBaseGeometry().then(() => {
+      this.createSubscriptions();
+    });
   }
 
   // Subscribe to user settings to update simulator
   public createSubscriptions() {
     fileURL.subscribe(async (value: string) => {
-      await this.uploadMesh(value);
+      await this.loadBaseGeometry(value);
       this.resetPhysics();
+      this.populateObject(this.baseGeometry);
       this.rescaleCamera();
     });
 
     viewMode.subscribe((mode: ViewMode) => {
       // Update our material regardless of the mode we are in.
       // We want the visualizer to be consistent with app state always.
-      this.updateMeshMaterial();
       switch (mode) {
-        case ViewMode.RAW_STL: {
+        case ViewMode.RAW_STL:
+        case ViewMode.TEXTURE:
+        case ViewMode.SHADER:
+          this.populateObject(this.baseGeometry);
           break;
-        }
-        case ViewMode.SHADER: {
-          break;
-        }
         case ViewMode.SIMULATION: {
-          // If we are undefined.
-          // TODO: get rendering of voxzelspace working, and reduce the compute time for generating the voxel.
-          // if (this.voxelspace === undefined)
-          //   this.voxelspace = new VoxelSpace(50, 50, 50, this.mesh);
-
-          // console.log(this.voxelspace.getSpace());
-
+          this.simulator = new Simulator(this.baseGeometry);
+          this.simulator.updateMesh(this.mesh);
           this.resetPhysics();
           break;
         }
-        case ViewMode.TEXTURE: {
-          break;
-        }
       }
+      this.updateMeshMaterial();
     });
 
     layerHeight.subscribe(() => this.updateMeshMaterial());
@@ -162,7 +163,11 @@ export default class Visualizer {
     showSurfaceUVs.subscribe(() => this.updateMeshMaterial());
 
     smoothGeometry.subscribe((value) => {
-      this.uploadMesh(get(fileURL), value);
+      this.populateObject(this.baseGeometry, value);
+    });
+
+    simSpeed.subscribe((value) => {
+      this.simSpeed = value;
     });
   }
 
@@ -211,6 +216,7 @@ export default class Visualizer {
         normalMap: await getNormalMap(),
         normalScale: new Vector2(0.6, 0.01),
       });
+
       return;
     }
 
@@ -221,37 +227,44 @@ export default class Visualizer {
     });
   }
 
-  public populateObject(geometry: BufferGeometry, smoothGeometry: boolean) {
-    geometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
-    this.mesh = new Mesh(geometry, undefined);
-    if (smoothGeometry) {
-      geometry = toCreasedNormals(geometry, Math.PI / 5);
-      geometry = mergeVertices(geometry);
-      geometry.computeVertexNormals();
+  // Populate the mesh with the given geometry
+  public populateObject(
+    geometry: BufferGeometry,
+    doSmoothGeometry: boolean = get(smoothGeometry),
+  ) {
+    let displayGeometry: BufferGeometry;
+    if (get(viewMode) == ViewMode.SIMULATION) {
+      displayGeometry = geometry.clone();
+    } else {
+      displayGeometry = geometry.clone();
+    }
+
+    this.mesh = new Mesh(displayGeometry, undefined);
+    if (doSmoothGeometry) {
+      displayGeometry = toCreasedNormals(displayGeometry, Math.PI / 5);
+      displayGeometry = mergeVertices(displayGeometry);
+      displayGeometry.computeVertexNormals(); // Recompute existing vertex normals
     }
     this.normals = new VertexNormalsHelper(this.mesh, 1, 0xa4036f);
+
+    this.group.clear();
     this.group.add(this.mesh);
     this.group.add(this.normals);
+
     if (this.normals) this.normals.visible = get(showVertexNormals);
     this.updateMeshMaterial();
   }
 
-  // Upload the mesh being displayed based on a certain fileURL
-  //
-  // utah_teapot.stl
-  public async uploadMesh(
-    fileURL: string = 'utah_teapot.stl',
-    doSmoothGeometry: boolean = get(smoothGeometry),
-  ) {
+  // Download the geometry being displayed based on a certain fileURL
+  public async loadBaseGeometry(fileURL: string = 'utah_teapot.stl') {
     let loadingMessage = `Loading ...${fileURL.slice(-30)}`;
     startLoading(loadingMessage);
-    // Remove previous mesh
-    this.group.clear();
 
     // Load STL
     const loader = new STLLoader();
-    let geometry: BufferGeometry = await loader.loadAsync(fileURL);
-    this.populateObject(geometry, doSmoothGeometry);
+    this.baseGeometry = await loader.loadAsync(fileURL);
+    this.baseGeometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
+    this.baseGeometry.computeVertexNormals();
 
     clearLoading(loadingMessage);
   }
@@ -275,21 +288,17 @@ export default class Visualizer {
 
   public resetPhysics() {
     this.clock = new Clock();
-    this.group.position.y = 0;
-    this.group.v = new Vector3(0, 10, 0);
-    this.group.a = new Vector3(0, -10, 0); // Accelerate downwards
-  }
-
-  public updatePhysics(delta: number) {
-    this.group.stepPhysics(delta);
+    this.simulator.reset();
   }
 
   public updateScene() {
     // Update view based on controls (mouse)
     this.controls.update();
-    // Update the physics model
+
+    // Update simulation
     if (get(viewMode) == ViewMode.SIMULATION) {
-      this.updatePhysics(this.clock.getDelta() * this.simSpeed);
+      this.simulator.update(this.clock.getDelta() * this.simSpeed); // Update the physics model
+      this.simulator.updateMesh(this.mesh); // Regenerate the mesh based on the simulator state
     }
   }
 
