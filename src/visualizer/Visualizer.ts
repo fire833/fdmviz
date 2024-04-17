@@ -5,6 +5,8 @@ import {
   Clock,
   Color,
   DirectionalLight,
+  DynamicDrawUsage,
+  Float32BufferAttribute,
   LineSegments,
   Mesh,
   MeshNormalMaterial,
@@ -46,33 +48,39 @@ import { PhysicsObject } from './simulation/PhysicsObject';
 import VoxelSpace from './simulation/VoxelSpace';
 import { generateUVs, getNormalMap, getUVMap } from './textures/NormalMap';
 
-import * as THREE from 'three';
-import { marchingCubes, metaBalls } from './simulation/MarchingCubes';
+import {
+  generateVoxels,
+  marchingCubes,
+  metaBalls,
+  points,
+  values,
+} from './simulation/MarchingCubes';
 
 let container;
 
 let time = 0;
-
-const clock = new THREE.Clock();
 
 // BUFFER GEOMETRY
 
 const maxPolygons = 30000;
 const vertices = Array(3 * maxPolygons).fill(0);
 
-const meshBufferGeometry = new THREE.BufferGeometry();
-const buffer = new THREE.Float32BufferAttribute(vertices, 3);
-buffer.setUsage(THREE.DynamicDrawUsage);
+const meshBufferGeometry = new BufferGeometry();
+const buffer = new Float32BufferAttribute(vertices, 3);
+buffer.setUsage(DynamicDrawUsage);
 meshBufferGeometry.setAttribute('position', buffer);
 
-const mesh2 = new THREE.Mesh(
+const mesh2 = new Mesh(
   meshBufferGeometry,
-  new THREE.MeshPhongMaterial({ color: 0xffffff }),
+  new MeshPhysicalMaterial({
+    color: new Color('white'),
+    roughness: 0.4,
+  }),
 );
 mesh2.castShadow = true;
 mesh2.receiveShadow = true;
 
-function updateMesh(trianglePoints: THREE.Vector3[]) {
+function updateMesh(trianglePoints: Vector3[]) {
   for (let i = 0; i < trianglePoints.length; i++) {
     const x = trianglePoints[i].x;
     const y = trianglePoints[i].y;
@@ -82,8 +90,8 @@ function updateMesh(trianglePoints: THREE.Vector3[]) {
     vertices[i * 3 + 1] = y;
     vertices[i * 3 + 2] = z;
   }
-  const positionAttribute = new THREE.Float32BufferAttribute(vertices, 3);
-  positionAttribute.setUsage(THREE.DynamicDrawUsage);
+  const positionAttribute = new Float32BufferAttribute(vertices, 3);
+  positionAttribute.setUsage(DynamicDrawUsage);
   meshBufferGeometry.setAttribute('position', positionAttribute);
   meshBufferGeometry.setDrawRange(0, trianglePoints.length);
   meshBufferGeometry.computeVertexNormals();
@@ -106,8 +114,6 @@ export default class Visualizer {
   private mesh: Mesh;
   private normals: LineSegments;
   private simSpeed: number;
-
-  public vertex = new THREE.Vector3();
 
   constructor() {
     // Set up renderer
@@ -341,24 +347,19 @@ export default class Visualizer {
   }
 
   public updatePhysics(delta: number) {
-    this.group.stepPhysics(delta);
+    metaBalls[0].center.x += 0.01;
   }
 
   public updateScene() {
     // Update view based on controls (mouse)
     this.controls.update();
-    // Update the physics model
     if (get(viewMode) == ViewMode.SIMULATION) {
-      //Simulate the object in marching cubes
-      const delta = this.clock.getDelta();
+      // Update the physics model
+      this.updatePhysics(this.clock.getDelta() * this.simSpeed);
 
-      time += delta * this.simSpeed * 0.5;
-
-      metaBalls[0].center.x = Math.sin(time) * 2;
-      metaBalls[0].center.y = Math.cos(time) * 2;
-
-      // marching cubes 2
-      const triangles = marchingCubes();
+      // Regenerate the voxels based on the scene
+      generateVoxels(metaBalls);
+      const triangles = marchingCubes(points, values);
       updateMesh(triangles);
     }
   }
