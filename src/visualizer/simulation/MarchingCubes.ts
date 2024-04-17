@@ -5,51 +5,6 @@ export const resolution = 40;
 export const scale = 10;
 const isolevel = 0.5;
 
-export let points: Vector3[];
-export let values: number[];
-export let metaBalls: { center: Vector3; radius: number }[] = [];
-metaBalls.push({ center: new Vector3(-3, 1, 0), radius: 0.2 });
-metaBalls.push({ center: new Vector3(2, 0, 0), radius: 0.5 });
-metaBalls.push({ center: new Vector3(2, 0, -2), radius: 0.25 });
-
-export function generateVoxels(
-  metaBalls: { center: Vector3; radius: number }[],
-) {
-  points = [];
-  values = [];
-
-  // generate the list of 3D points
-  for (var k = 0; k < resolution; k++) {
-    for (var j = 0; j < resolution; j++) {
-      for (var i = 0; i < resolution; i++) {
-        var x = -(scale / 2) + (scale * i) / (resolution - 1);
-        var y = -(scale / 2) + (scale * j) / (resolution - 1);
-        var z = -(scale / 2) + (scale * k) / (resolution - 1);
-        points.push(new Vector3(x, y, z));
-      }
-    }
-  }
-  // generate values array for points
-  const total = resolution * resolution * resolution;
-  for (var i = 0; i < total; i++) values[i] = 0;
-
-  //Add "Rule" here changing the value of each point given the list passed in
-  // meta balls
-  for (const metaBall of metaBalls) {
-    for (let i = 0; i < points.length; i++) {
-      // meta ball function
-      const distance = metaBall.radius - metaBall.center.distanceTo(points[i]);
-      values[i] += Math.exp(-(distance * distance));
-    }
-  }
-
-  //Adds floor (Created by yours truly CMATT)
-  for (let i = 0; i < points.length; i++) {
-    // meta ball function
-    values[i] += Math.exp(-points[i].y - 4.3);
-  }
-}
-
 // Returns a list of vectors, to be grouped as the triplets which are the vertices of each face
 export function marchingCubes(points: Vector3[], values: number[]): Vector3[] {
   // approximated intersection points

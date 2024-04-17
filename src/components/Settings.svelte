@@ -163,6 +163,8 @@
     border-radius: 0 6px 6px 0;
 
     gap: 1rem;
+    overflow: scroll;
+    max-height: 80vh;
   }
 
   .align {

@@ -21,3 +21,11 @@
 </script>
 
 <div bind:this={container}></div>
+
+<style>
+  div {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+  }
+</style>

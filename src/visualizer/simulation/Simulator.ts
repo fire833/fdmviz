@@ -16,7 +16,8 @@ export default class Simulator {
   private vertices: Array<Vector3> = Array<Vector3>(3 * this.maxPolygons);
   private metaBalls: { center: Vector3; radius: number }[] = [];
 
-  constructor() {
+  constructor(baseGeometry: BufferGeometry) {
+    // TODO: Create voxelSpace based on base geometry
     this.reset();
   }
 

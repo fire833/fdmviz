@@ -113,8 +113,7 @@ export default class Visualizer {
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.3;
     this.controls.autoRotate = get(orbit);
-
-    this.simulator = new Simulator();
+    this.simulator = new Simulator(this.baseGeometry);
 
     this.loadBaseGeometry().then(() => {
       this.createSubscriptions();
@@ -137,11 +136,11 @@ export default class Visualizer {
         case ViewMode.RAW_STL:
         case ViewMode.TEXTURE:
         case ViewMode.SHADER:
+          this.populateObject(this.baseGeometry);
           break;
         case ViewMode.SIMULATION: {
-          // TODO: get rendering of voxelspace working, and reduce the compute time for generating the voxel.
-          // if (this.voxelspace === undefined)
-          //   this.voxelspace = new VoxelSpace(50, 50, 50, this.mesh);
+          this.simulator = new Simulator(this.baseGeometry);
+          this.simulator.updateMesh(this.mesh);
           this.resetPhysics();
           break;
         }
