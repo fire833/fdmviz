@@ -41,6 +41,7 @@
       position: absolute;
       right: 0;
       bottom: 0;
+      display: flex;
   
       padding: 0.6rem;
   

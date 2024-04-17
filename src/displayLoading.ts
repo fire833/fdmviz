@@ -2,11 +2,11 @@ import { loadingMessages } from './stores';
 
 // Executes the given callback, displaying the loadingMessage while the callback executes.
 export async function displayLoading(
-  callback: () => void,
+  callback: () => any,
   loadingMessage: String,
 ) {
   startLoading(loadingMessage);
-  callback();
+  await callback();
   clearLoading(loadingMessage);
 }
 

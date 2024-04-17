@@ -47,7 +47,6 @@ export async function getNormalMap(): Promise<Texture> {
   let normalTexture: Texture;
 
   let loadingMessage = 'Loading 3D Printed Texture';
-
   startLoading(loadingMessage);
   let loader = new TextureLoader().loadAsync('alan_warburton.png');
   normalTexture = await loader;
@@ -64,5 +63,8 @@ export async function getNormalMap(): Promise<Texture> {
 
 export async function getUVMap(): Promise<Texture> {
   // Load the image
+  let loadingMessage = 'Loading UV Checker Map';
+  startLoading(loadingMessage);
   return new TextureLoader().loadAsync('uv_checker.png');
+  clearLoading(loadingMessage);
 }

@@ -39,6 +39,7 @@ import {
   mergeVertices,
   toCreasedNormals,
 } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { clearLoading, startLoading } from '../displayLoading';
 import layerFrag from './shaders/layerShader.frag';
 import layerVert from './shaders/layerShader.vert';
 import { PhysicsObject } from './simulation/PhysicsObject';
@@ -242,6 +243,8 @@ export default class Visualizer {
     fileURL: string = 'utah_teapot.stl',
     doSmoothGeometry: boolean = get(smoothGeometry),
   ) {
+    let loadingMessage = `Loading ...${fileURL.slice(-30)}`;
+    startLoading(loadingMessage);
     // Remove previous mesh
     this.group.clear();
 
@@ -249,6 +252,8 @@ export default class Visualizer {
     const loader = new STLLoader();
     let geometry: BufferGeometry = await loader.loadAsync(fileURL);
     this.populateObject(geometry, doSmoothGeometry);
+
+    clearLoading(loadingMessage);
   }
 
   // Rescale the camera to fit and be centered on the mesh
