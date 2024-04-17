@@ -1,9 +1,9 @@
 import { Vector3 } from 'three';
 import { edgeTable, triTable } from './LookUpTable';
 
-const resolution = 40;
-const scale = 10;
-const isolevel = 0.5;
+export const resolution = 40;
+export const scale = 10;
+export const isolevel = 0.5;
 
 export let points: Vector3[];
 export let values: number[];

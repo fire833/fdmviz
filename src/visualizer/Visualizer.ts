@@ -7,6 +7,7 @@ import {
   DirectionalLight,
   DynamicDrawUsage,
   Float32BufferAttribute,
+  Group,
   LineSegments,
   Mesh,
   MeshNormalMaterial,
@@ -44,21 +45,9 @@ import {
 import { clearLoading, startLoading } from '../displayLoading';
 import layerFrag from './shaders/layerShader.frag';
 import layerVert from './shaders/layerShader.vert';
-import { PhysicsObject } from './simulation/PhysicsObject';
-import VoxelSpace from './simulation/VoxelSpace';
 import { generateUVs, getNormalMap, getUVMap } from './textures/NormalMap';
 
-import {
-  generateVoxels,
-  marchingCubes,
-  metaBalls,
-  points,
-  values,
-} from './simulation/MarchingCubes';
-
-let container;
-
-let time = 0;
+import Simulator from './simulation/Simulator';
 
 // BUFFER GEOMETRY
 
@@ -107,10 +96,10 @@ export default class Visualizer {
   container = document.getElementById('container');
 
   // Scene state
+  private simulator: Simulator;
   private scene: Scene;
   private clock: Clock; // Timer for physics/animations
-  private group: PhysicsObject; // Holds the mesh and normals
-  private voxelspace: VoxelSpace | undefined;
+  private group: Group; // Holds the mesh and normals
   private mesh: Mesh;
   private normals: LineSegments;
   private simSpeed: number;
@@ -147,7 +136,7 @@ export default class Visualizer {
     this.scene.add(directLight2);
 
     // Initialize the group containing the mesh
-    this.group = new PhysicsObject();
+    this.group = new Group();
 
     //Comment next line and uncomment line after to get marchiing cubes by itself
     this.scene.add(this.group);
@@ -166,6 +155,8 @@ export default class Visualizer {
     this.controls.dampingFactor = 0.3;
     this.controls.autoRotate = get(orbit);
     this.createSubscriptions();
+
+    this.simulator = new Simulator();
   }
 
   // Subscribe to user settings to update simulator
@@ -334,13 +325,11 @@ export default class Visualizer {
 
   public resetPhysics() {
     this.clock = new Clock();
-    this.group.position.y = 0;
-    this.group.v = new Vector3(0, 10, 0);
-    this.group.a = new Vector3(0, -10, 0); // Accelerate downwards
+    this.simulator.reset();
   }
 
   public updatePhysics(delta: number) {
-    metaBalls[0].center.x += 0.01;
+    this.simulator.update(delta);
   }
 
   public updateScene() {
@@ -351,9 +340,7 @@ export default class Visualizer {
       this.updatePhysics(this.clock.getDelta() * this.simSpeed);
 
       // Regenerate the voxels based on the scene
-      generateVoxels(metaBalls);
-      const triangles = marchingCubes(points, values);
-      updateMesh(triangles);
+      updateMesh(this.simulator.getTriangles());
     }
   }
 
