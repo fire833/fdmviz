@@ -1,4 +1,9 @@
-import { Vector3 } from 'three';
+import {
+  BufferGeometry,
+  DynamicDrawUsage,
+  Float32BufferAttribute,
+  Vector3,
+} from 'three';
 import { marchingCubes, resolution, scale } from './MarchingCubes';
 import type VoxelSpace from './VoxelSpace';
 
@@ -7,6 +12,8 @@ export default class Simulator {
   points: Vector3[] = [];
   values: number[] = [];
   public metaBalls: { center: Vector3; radius: number }[] = [];
+  private maxPolygons = 30000;
+  vertices: Array<Vector3> = Array<Vector3>(3 * this.maxPolygons);
 
   constructor() {
     this.reset();
@@ -65,5 +72,26 @@ export default class Simulator {
 
   getTriangles(): Vector3[] {
     return marchingCubes(this.points, this.values);
+  }
+
+  updateMesh(meshBufferGeometry: BufferGeometry) {
+    const vertices = Array(3 * this.maxPolygons).fill(0);
+    let trianglePoints: Vector3[] = this.getTriangles();
+    for (let i = 0; i < trianglePoints.length; i++) {
+      const x = trianglePoints[i].x;
+      const y = trianglePoints[i].y;
+      const z = trianglePoints[i].z;
+
+      vertices[i * 3] = x;
+      vertices[i * 3 + 1] = y;
+      vertices[i * 3 + 2] = z;
+    }
+    const positionAttribute = new Float32BufferAttribute(vertices, 3);
+    positionAttribute.setUsage(DynamicDrawUsage);
+    meshBufferGeometry.setAttribute('position', positionAttribute);
+    meshBufferGeometry.setDrawRange(0, trianglePoints.length);
+    meshBufferGeometry.computeVertexNormals();
+    meshBufferGeometry.getAttribute('position').needsUpdate = true;
+    meshBufferGeometry.getAttribute('normal').needsUpdate = true;
   }
 }

@@ -69,25 +69,6 @@ const mesh2 = new Mesh(
 mesh2.castShadow = true;
 mesh2.receiveShadow = true;
 
-function updateMesh(trianglePoints: Vector3[]) {
-  for (let i = 0; i < trianglePoints.length; i++) {
-    const x = trianglePoints[i].x;
-    const y = trianglePoints[i].y;
-    const z = trianglePoints[i].z;
-
-    vertices[i * 3] = x;
-    vertices[i * 3 + 1] = y;
-    vertices[i * 3 + 2] = z;
-  }
-  const positionAttribute = new Float32BufferAttribute(vertices, 3);
-  positionAttribute.setUsage(DynamicDrawUsage);
-  meshBufferGeometry.setAttribute('position', positionAttribute);
-  meshBufferGeometry.setDrawRange(0, trianglePoints.length);
-  meshBufferGeometry.computeVertexNormals();
-  meshBufferGeometry.getAttribute('position').needsUpdate = true;
-  meshBufferGeometry.getAttribute('normal').needsUpdate = true;
-}
-
 export default class Visualizer {
   private webgl: WebGLRenderer;
   private camera: PerspectiveCamera;
@@ -328,19 +309,14 @@ export default class Visualizer {
     this.simulator.reset();
   }
 
-  public updatePhysics(delta: number) {
-    this.simulator.update(delta);
-  }
-
   public updateScene() {
     // Update view based on controls (mouse)
     this.controls.update();
-    if (get(viewMode) == ViewMode.SIMULATION) {
-      // Update the physics model
-      this.updatePhysics(this.clock.getDelta() * this.simSpeed);
 
-      // Regenerate the voxels based on the scene
-      updateMesh(this.simulator.getTriangles());
+    // Update simulation
+    if (get(viewMode) == ViewMode.SIMULATION) {
+      this.simulator.update(this.clock.getDelta() * this.simSpeed); // Update the physics model
+      this.simulator.updateMesh(meshBufferGeometry); // Regenerate the mesh based on the simulator state
     }
   }
 

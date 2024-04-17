@@ -3,7 +3,7 @@ import { edgeTable, triTable } from './LookUpTable';
 
 export const resolution = 40;
 export const scale = 10;
-export const isolevel = 0.5;
+const isolevel = 0.5;
 
 export let points: Vector3[];
 export let values: number[];
