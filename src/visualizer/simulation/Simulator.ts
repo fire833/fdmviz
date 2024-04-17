@@ -2,6 +2,7 @@ import {
   BufferGeometry,
   DynamicDrawUsage,
   Float32BufferAttribute,
+  Mesh,
   Vector3,
 } from 'three';
 import { marchingCubes, resolution, scale } from './MarchingCubes';
@@ -9,11 +10,11 @@ import type VoxelSpace from './VoxelSpace';
 
 export default class Simulator {
   private voxelSpace: VoxelSpace | undefined;
-  points: Vector3[] = [];
-  values: number[] = [];
-  public metaBalls: { center: Vector3; radius: number }[] = [];
   private maxPolygons = 30000;
-  vertices: Array<Vector3> = Array<Vector3>(3 * this.maxPolygons);
+  private points: Vector3[] = [];
+  private values: number[] = [];
+  private vertices: Array<Vector3> = Array<Vector3>(3 * this.maxPolygons);
+  private metaBalls: { center: Vector3; radius: number }[] = [];
 
   constructor() {
     this.reset();
@@ -74,9 +75,14 @@ export default class Simulator {
     return marchingCubes(this.points, this.values);
   }
 
-  updateMesh(meshBufferGeometry: BufferGeometry) {
+  getGeometry(): BufferGeometry {
+    return new BufferGeometry();
+  }
+
+  updateMesh(mesh: Mesh) {
     const vertices = Array(3 * this.maxPolygons).fill(0);
     let trianglePoints: Vector3[] = this.getTriangles();
+
     for (let i = 0; i < trianglePoints.length; i++) {
       const x = trianglePoints[i].x;
       const y = trianglePoints[i].y;
@@ -86,12 +92,13 @@ export default class Simulator {
       vertices[i * 3 + 1] = y;
       vertices[i * 3 + 2] = z;
     }
+    // Update mesh with new triangles
     const positionAttribute = new Float32BufferAttribute(vertices, 3);
     positionAttribute.setUsage(DynamicDrawUsage);
-    meshBufferGeometry.setAttribute('position', positionAttribute);
-    meshBufferGeometry.setDrawRange(0, trianglePoints.length);
-    meshBufferGeometry.computeVertexNormals();
-    meshBufferGeometry.getAttribute('position').needsUpdate = true;
-    meshBufferGeometry.getAttribute('normal').needsUpdate = true;
+    mesh.geometry.setAttribute('position', positionAttribute);
+    mesh.geometry.setDrawRange(0, trianglePoints.length);
+    mesh.geometry.computeVertexNormals();
+    mesh.geometry.getAttribute('position').needsUpdate = true;
+    mesh.geometry.getAttribute('normal').needsUpdate = true;
   }
 }
