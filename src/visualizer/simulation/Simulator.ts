@@ -13,7 +13,6 @@ export default class Simulator {
   private maxPolygons = 30000;
   private points: Vector3[] = [];
   private values: number[] = [];
-  private vertices: Array<Vector3> = Array<Vector3>(3 * this.maxPolygons);
   private metaBalls: { center: Vector3; radius: number }[] = [];
 
   constructor(baseGeometry: BufferGeometry) {

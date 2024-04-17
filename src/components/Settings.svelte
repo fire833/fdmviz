@@ -163,7 +163,8 @@
     border-radius: 0 6px 6px 0;
 
     gap: 1rem;
-    overflow: scroll;
+    overflow-x: auto;
+    overflow-y: scroll;
     max-height: 80vh;
   }
 
