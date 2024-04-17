@@ -65,6 +65,8 @@ export async function getUVMap(): Promise<Texture> {
   // Load the image
   let loadingMessage = 'Loading UV Checker Map';
   startLoading(loadingMessage);
-  return new TextureLoader().loadAsync('uv_checker.png');
-  clearLoading(loadingMessage);
+
+  let promise = new TextureLoader().loadAsync('uv_checker.png');
+  promise.then(() => clearLoading(loadingMessage));
+  return promise;
 }
