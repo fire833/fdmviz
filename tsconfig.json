@@ -15,7 +15,8 @@
     "checkJs": true,
     "isolatedModules": true,
     "types": [
-      "vite-plugin-glsl/ext"
+      "vite-plugin-glsl/ext",
+      "vite/client"
     ],
   },
   "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
