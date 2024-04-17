@@ -181,24 +181,17 @@ export default class Visualizer {
       // We want the visualizer to be consistent with app state always.
       this.updateMeshMaterial();
       switch (mode) {
-        case ViewMode.RAW_STL: {
+        case ViewMode.RAW_STL:
           break;
-        }
-        case ViewMode.SHADER: {
+        case ViewMode.TEXTURE:
           break;
-        }
+        case ViewMode.SHADER:
+          break;
         case ViewMode.SIMULATION: {
-          // If we are undefined.
-          // TODO: get rendering of voxzelspace working, and reduce the compute time for generating the voxel.
+          // TODO: get rendering of voxelspace working, and reduce the compute time for generating the voxel.
           // if (this.voxelspace === undefined)
           //   this.voxelspace = new VoxelSpace(50, 50, 50, this.mesh);
-
-          // console.log(this.voxelspace.getSpace());
-
           this.resetPhysics();
-          break;
-        }
-        case ViewMode.TEXTURE: {
           break;
         }
       }
