@@ -15,7 +15,7 @@ export default class Simulator {
   private values: number[] = [];
   private metaBalls: { center: Vector3; radius: number }[] = [];
 
-  constructor(baseGeometry: BufferGeometry) {
+  constructor(geom: BufferGeometry) {
     // TODO: Create voxelSpace based on base geometry
     this.reset();
   }
@@ -53,7 +53,7 @@ export default class Simulator {
     const total = resolution * resolution * resolution;
     for (var i = 0; i < total; i++) this.values[i] = 0;
 
-    //Add "Rule" here changing the value of each point given the list passed in
+    // Add "Rule" here changing the value of each point given the list passed in
     // meta balls
     for (const metaBall of this.metaBalls) {
       for (let i = 0; i < this.points.length; i++) {
@@ -64,7 +64,7 @@ export default class Simulator {
       }
     }
 
-    //Adds floor (Created by yours truly CMATT)
+    // Adds floor (Created by yours truly CMATT)
     for (let i = 0; i < this.points.length; i++) {
       // meta ball function
       this.values[i] += Math.exp(-this.points[i].y - 4.3);

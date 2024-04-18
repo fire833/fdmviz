@@ -1,8 +1,9 @@
 import { Mesh, Raycaster, Vector3 } from 'three';
+import { marchingCubes } from './MarchingCubes';
 
 export default class VoxelSpace {
   // The list of lattice points that are populated with volume.
-  private points: Map<[number, number, number], Voxel> = new Map();
+  private points: Map<Vector3, Voxel> = new Map();
 
   // The bases that we want to use for intersection detection purposes.
   private bases: Array<Vector3> = Array<Vector3>(
@@ -22,7 +23,7 @@ export default class VoxelSpace {
           const pos: Vector3 = new Vector3(x, y, z);
           const caster = new Raycaster();
           if (this.insideMesh(caster, pos, mesh)) {
-            this.points.set([x, y, z], new Voxel(z));
+            this.points.set(new Vector3(x, y, z), new Voxel(z));
           }
         }
       }
@@ -47,12 +48,12 @@ export default class VoxelSpace {
     return false;
   }
 
-  public getSpace(): Array<[number, number, number]> {
-    let space: Array<[number, number, number]> = new Array<
-      [number, number, number]
-    >();
-    for (const [p, _] of this.points) space.push(p);
-    return space;
+  // returns the space as a set of points via marchingCubes.
+  public getSpace(): Vector3[] {
+    let keys = this.points.keys();
+    let points: Vector3[] = [];
+    for (const key of keys) points.push(key);
+    return marchingCubes(points, []);
   }
 
   // Perform one physics step on the space.
