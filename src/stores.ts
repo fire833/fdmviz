@@ -11,7 +11,7 @@ export const viewMode = writable<ViewMode>(ViewMode.RAW_STL);
 export const loadingMessages = writable<Array<String>>(new Array<String>());
 // Parameters
 export const layerHeight = writable<number>(0.2); // mm
-export const simSpeed = writable<number>(1); // factor
+export const simSpeed = writable<number>(1); // ticks per second
 export const temperature = writable<number>(150); // °C
 // Features
 export const orbit = writable<boolean>(true);
