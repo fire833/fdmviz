@@ -2,7 +2,6 @@ import {
   BufferGeometry,
   DynamicDrawUsage,
   Float32BufferAttribute,
-  Mesh,
   Vector3,
 } from 'three';
 import { marchingCubes, resolution, scale } from './MarchingCubes';
@@ -76,10 +75,8 @@ export default class Simulator {
   }
 
   getGeometry(): BufferGeometry {
-    return new BufferGeometry();
-  }
+    let geometry = new BufferGeometry();
 
-  updateMesh(mesh: Mesh) {
     const vertices = Array(3 * this.maxPolygons).fill(0);
     let trianglePoints: Vector3[] = this.getTriangles();
 
@@ -95,10 +92,12 @@ export default class Simulator {
     // Update mesh with new triangles
     const positionAttribute = new Float32BufferAttribute(vertices, 3);
     positionAttribute.setUsage(DynamicDrawUsage);
-    mesh.geometry.setAttribute('position', positionAttribute);
-    mesh.geometry.setDrawRange(0, trianglePoints.length);
-    mesh.geometry.computeVertexNormals();
-    mesh.geometry.getAttribute('position').needsUpdate = true;
-    mesh.geometry.getAttribute('normal').needsUpdate = true;
+    geometry.setAttribute('position', positionAttribute);
+    geometry.setDrawRange(0, trianglePoints.length);
+    geometry.computeVertexNormals();
+    geometry.getAttribute('position').needsUpdate = true;
+    geometry.getAttribute('normal').needsUpdate = true;
+
+    return geometry;
   }
 }

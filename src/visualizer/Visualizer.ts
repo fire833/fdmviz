@@ -140,7 +140,8 @@ export default class Visualizer {
           break;
         case ViewMode.SIMULATION: {
           this.simulator = new Simulator(this.baseGeometry);
-          this.simulator.updateMesh(this.mesh);
+          // this.simulator.updateMesh(this.mesh);
+          this.populateObject(this.simulator.getGeometry());
           this.resetPhysics();
           break;
         }
@@ -298,7 +299,7 @@ export default class Visualizer {
     // Update simulation
     if (get(viewMode) == ViewMode.SIMULATION) {
       this.simulator.update(this.clock.getDelta() * this.simSpeed); // Update the physics model
-      this.simulator.updateMesh(this.mesh); // Regenerate the mesh based on the simulator state
+      this.populateObject(this.simulator.getGeometry()); // Regenerate the mesh based on the simulator state
     }
   }
 
