@@ -265,7 +265,6 @@ export default class Visualizer {
     const loader = new STLLoader();
     this.baseGeometry = await loader.loadAsync(fileURL);
     this.baseGeometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
-    this.baseGeometry.computeVertexNormals();
 
     clearLoading(loadingMessage);
   }
