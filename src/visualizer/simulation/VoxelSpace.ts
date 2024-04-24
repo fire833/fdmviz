@@ -12,7 +12,7 @@ export default class VoxelSpace {
   sizey: number;
   sizez: number;
   // The list of voxels (tupleToString([x,y,z])) that are non-empty.
-  private voxels: Map<string, Voxel> = new Map();
+  private voxels: Map<string, Voxel>;
 
   // The bases that we want to use for intersection detection purposes.
   private bases: Array<Vector3> = Array<Vector3>(
@@ -24,7 +24,7 @@ export default class VoxelSpace {
     new Vector3(0, 0, 1),
   );
 
-  // Build a new voxelspace from a BufferGeometry.
+  // Build a new voxelspace by a voxelizing BufferGeometry.
   constructor(
     geom: BufferGeometry,
     spacex: number = 40,
@@ -34,22 +34,28 @@ export default class VoxelSpace {
     this.sizex = spacex;
     this.sizey = spacey;
     this.sizez = spacez;
+    this.voxels = this.voxelize(geom);
+  }
 
-    let mesh = new Mesh(geom);
+  private voxelize(geom: BufferGeometry): Map<string, Voxel> {
+    const voxels: Map<string, Voxel> = new Map();
+
+    const mesh = new Mesh(geom);
     mesh.material = new MeshBasicMaterial();
     mesh.material.side = DoubleSide;
-
     const raycaster = new Raycaster();
 
-    for (let x = 0; x < spacex; x++) {
-      for (let y = 0; y < spacey; y++) {
-        for (let z = 0; z < spacez; z++) {
+    for (let x = 0; x < this.sizex; x++) {
+      for (let y = 0; y < this.sizey; y++) {
+        for (let z = 0; z < this.sizez; z++) {
           if (this.insideMesh(raycaster, new Vector3(x, y, z), mesh)) {
-            this.voxels.set(this.tupleToString([x, y, z]), new Voxel(z));
+            voxels.set(this.tupleToString([x, y, z]), new Voxel(z));
           }
         }
       }
     }
+
+    return voxels;
   }
 
   // Method to use a raycaster to determine whether we are inside of the

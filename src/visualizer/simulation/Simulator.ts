@@ -21,6 +21,7 @@ export default class Simulator {
     this.generateVoxels();
   }
 
+  // Reset the state of the simulator
   public reset() {}
 
   // Step the simulator forward by (delta) time
@@ -28,17 +29,12 @@ export default class Simulator {
 
   generateVoxels(): void {
     this.points = [];
-    this.values = [];
 
     for (var x = 0; x < resolution; x++) {
       for (var y = 0; y < resolution; y++) {
         for (var z = 0; z < resolution; z++) {
           this.points.push(new Vector3(x, y, z));
-          if (this.voxelSpace?.getFromCoords(x, y, z)) {
-            this.values.push(0);
-          } else {
-            this.values.push(10);
-          }
+          this.values.push(this.voxelSpace?.getFromCoords(x, y, z) ? 0 : 1); // 0 if populated, 1 if empty
         }
       }
     }
