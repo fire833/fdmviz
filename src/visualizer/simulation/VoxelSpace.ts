@@ -11,8 +11,8 @@ export default class VoxelSpace {
   sizex: number;
   sizey: number;
   sizez: number;
-  // The list of lattice points that are populated with volume.
-  private grid: Voxel[][][];
+  // The list of voxels (tupleToString([x,y,z])) that are non-empty.
+  private voxels: Map<string, Voxel> = new Map();
 
   // The bases that we want to use for intersection detection purposes.
   private bases: Array<Vector3> = Array<Vector3>(
@@ -39,16 +39,13 @@ export default class VoxelSpace {
     mesh.material = new MeshBasicMaterial();
     mesh.material.side = DoubleSide;
 
-    this.grid = new Array(spacex);
+    const raycaster = new Raycaster();
+
     for (let x = 0; x < spacex; x++) {
-      this.grid[x] = new Array(spacey);
-
       for (let y = 0; y < spacey; y++) {
-        this.grid[x][y] = new Array(spacez);
-
         for (let z = 0; z < spacez; z++) {
-          if (this.insideMesh(new Raycaster(), new Vector3(x, y, z), mesh)) {
-            this.grid[x][y][z] = new Voxel(z);
+          if (this.insideMesh(raycaster, new Vector3(x, y, z), mesh)) {
+            this.voxels.set(this.tupleToString([x, y, z]), new Voxel(z));
           }
         }
       }
@@ -70,14 +67,16 @@ export default class VoxelSpace {
     return rayCasterIntersects.length % 2 == 1;
   }
 
-  public getFromCoords(x: number, y: number, z: number): Voxel | null {
-    if (this.grid[x] && this.grid[x][y] && this.grid[x][y][z])
-      return this.grid[x][y][z];
-    else return null;
+  public getFromCoords(x: number, y: number, z: number): Voxel | undefined {
+    return this.voxels.get(this.tupleToString([x, y, z]));
   }
 
-  public getFromVector(vector: Vector3): Voxel | null {
+  public getFromVector(vector: Vector3): Voxel | undefined {
     return this.getFromCoords(vector.x, vector.y, vector.z);
+  }
+
+  private tupleToString(tuple: [number, number, number]): string {
+    return tuple.join(',');
   }
 }
 
