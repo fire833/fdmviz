@@ -1,9 +1,18 @@
-import { Mesh, Raycaster, Vector3 } from 'three';
-import { marchingCubes } from './MarchingCubes';
+import {
+  BufferGeometry,
+  DoubleSide,
+  Mesh,
+  MeshBasicMaterial,
+  Raycaster,
+  Vector3,
+} from 'three';
 
 export default class VoxelSpace {
+  sizex: number;
+  sizey: number;
+  sizez: number;
   // The list of lattice points that are populated with volume.
-  private points: Map<Vector3, Voxel> = new Map();
+  private grid: Voxel[][][];
 
   // The bases that we want to use for intersection detection purposes.
   private bases: Array<Vector3> = Array<Vector3>(
@@ -15,15 +24,31 @@ export default class VoxelSpace {
     new Vector3(0, 0, 1),
   );
 
-  // Build a new voxelspace from a mesh.
-  constructor(spacex: number, spacey: number, spacez: number, mesh: Mesh) {
+  // Build a new voxelspace from a BufferGeometry.
+  constructor(
+    geom: BufferGeometry,
+    spacex: number = 40,
+    spacey: number = 40,
+    spacez: number = 40,
+  ) {
+    this.sizex = spacex;
+    this.sizey = spacey;
+    this.sizez = spacez;
+
+    let mesh = new Mesh(geom);
+    mesh.material = new MeshBasicMaterial();
+    mesh.material.side = DoubleSide;
+
+    this.grid = new Array(spacex);
     for (let x = 0; x < spacex; x++) {
+      this.grid[x] = new Array(spacey);
+
       for (let y = 0; y < spacey; y++) {
+        this.grid[x][y] = new Array(spacez);
+
         for (let z = 0; z < spacez; z++) {
-          const pos: Vector3 = new Vector3(x, y, z);
-          const caster = new Raycaster();
-          if (this.insideMesh(caster, pos, mesh)) {
-            this.points.set(new Vector3(x, y, z), new Voxel(z));
+          if (this.insideMesh(new Raycaster(), new Vector3(x, y, z), mesh)) {
+            this.grid[x][y][z] = new Voxel(z);
           }
         }
       }
@@ -38,33 +63,29 @@ export default class VoxelSpace {
     position: Vector3,
     mesh: Mesh,
   ): boolean {
-    for (const vec of this.bases) {
-      caster.set(position, vec);
-      let rayCasterIntersects = caster.intersectObject(mesh, false);
-      // we need odd number of intersections
-      if (rayCasterIntersects.length % 2 === 1) return true;
-    }
+    caster.set(position, this.bases[0]);
+    let rayCasterIntersects = caster.intersectObject(mesh, false);
 
-    return false;
+    // we need odd number of intersections
+    return rayCasterIntersects.length % 2 == 1;
   }
 
-  // returns the space as a set of points via marchingCubes.
-  public getSpace(): Vector3[] {
-    let keys = this.points.keys();
-    let points: Vector3[] = [];
-    for (const key of keys) points.push(key);
-    return marchingCubes(points, []);
+  public getFromCoords(x: number, y: number, z: number): Voxel | null {
+    if (this.grid[x] && this.grid[x][y] && this.grid[x][y][z])
+      return this.grid[x][y][z];
+    else return null;
   }
 
-  // Perform one physics step on the space.
-  public step() {}
+  public getFromVector(vector: Vector3): Voxel | null {
+    return this.getFromCoords(vector.x, vector.y, vector.z);
+  }
 }
 
 export class Voxel {
-  temperature: number;
   // The original layer the particle existed in within the
   // lattice when it was added.
   layer: number;
+  temperature: number;
 
   constructor(layer: number) {
     this.layer = layer;
