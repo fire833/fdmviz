@@ -5,6 +5,7 @@ import {
   Clock,
   Color,
   DirectionalLight,
+  GridHelper,
   Group,
   LineSegments,
   Mesh,
@@ -64,6 +65,7 @@ export default class Visualizer {
   private mesh: Mesh;
   private normals: LineSegments;
   private simSpeed: number;
+  private grid: any;
 
   constructor() {
     // Set up renderer
@@ -93,6 +95,9 @@ export default class Visualizer {
     const directLight2 = new DirectionalLight('hsl(0, 0%, 100%)', 2);
     directLight2.position.set(5, -15, -35);
     this.scene.add(directLight2);
+
+    //Initialize the mesh for the base plate
+    this.grid = new GridHelper(220, 22);
 
     // Initialize the group containing the mesh
     this.group = new Group();
@@ -251,6 +256,7 @@ export default class Visualizer {
     this.group.clear();
     this.group.add(this.mesh);
     this.group.add(this.normals);
+    this.group.add(this.grid);
 
     if (this.normals) this.normals.visible = get(showVertexNormals);
     this.updateMeshMaterial();
@@ -294,6 +300,11 @@ export default class Visualizer {
   public updateScene() {
     // Update view based on controls (mouse)
     this.controls.update();
+    if (this.controls.getPolarAngle() > Math.PI / 2) {
+      this.grid.visible = false;
+    } else {
+      this.grid.visible = true;
+    }
 
     // Update simulation
     if (get(viewMode) == ViewMode.SIMULATION) {
