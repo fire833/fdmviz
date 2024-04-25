@@ -98,6 +98,7 @@ export default class Visualizer {
 
     //Initialize the mesh for the base plate
     this.grid = new GridHelper(220, 22);
+    this.scene.add(this.grid);
 
     // Initialize the group containing the mesh
     this.group = new Group();
@@ -256,7 +257,6 @@ export default class Visualizer {
     this.group.clear();
     this.group.add(this.mesh);
     this.group.add(this.normals);
-    this.group.add(this.grid);
 
     if (this.normals) this.normals.visible = get(showVertexNormals);
     this.updateMeshMaterial();
@@ -305,7 +305,6 @@ export default class Visualizer {
     } else {
       this.grid.visible = true;
     }
-
     // Update simulation
     if (get(viewMode) == ViewMode.SIMULATION) {
       this.simulator.update(this.clock.getDelta() * this.simSpeed); // Update the physics model
