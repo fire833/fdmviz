@@ -5,14 +5,19 @@ export const openModal = writable<boolean>(false);
 
 // Store for the FileURL
 export const fileURL = writable<string>();
+
 // Store for the current viewMode, should affect viewport.
 export const viewMode = writable<ViewMode>(ViewMode.RAW_STL);
+
 // Loading
 export const loadingMessages = writable<Array<String>>(new Array<String>());
+
 // Parameters
 export const layerHeight = writable<number>(0.2); // mm
 export const simSpeed = writable<number>(1); // ticks per second
 export const temperature = writable<number>(150); // °C
+export const spaceDim = writable<number>(25); // Dimension of voxel space
+
 // Features
 export const orbit = writable<boolean>(true);
 export const showVertexNormals = writable<boolean>(false);

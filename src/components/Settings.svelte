@@ -15,6 +15,7 @@
     orbit,
     smoothGeometry,
     showSurfaceUVs,
+    spaceDim,
   } from '../stores';
 
   const dispatchModalEvent = createEventDispatcher();
@@ -77,6 +78,15 @@
         min="0.25"
         max="4.0"
         step="0.25"
+      />
+      <div class="align">Voxel Space Dimensions</div>
+      <input
+        type="number"
+        bind:value={$spaceDim}
+        min="5"
+        max="75"
+        step="1"
+        disabled
       />
       <div class="align">Temperature (°C)</div>
       <input
