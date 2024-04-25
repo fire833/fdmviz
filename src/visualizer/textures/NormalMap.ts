@@ -30,7 +30,7 @@ export function generateUVs(mesh: Mesh): void {
     const offsetY = (posAttribute.getY(i) - center.y) / radius;
     const offsetZ = (posAttribute.getZ(i) - center.z) / radius;
 
-    const u = 0.5 + Math.atan2(offsetZ, offsetX) / (2 * Math.PI);
+    const u = 0.5 - Math.atan2(offsetZ, offsetX) / (2 * Math.PI);
     const v = 0.5 + Math.asin(offsetY) / Math.PI;
 
     // Modify u and v as needed
