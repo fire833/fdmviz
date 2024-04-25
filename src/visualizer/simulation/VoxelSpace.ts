@@ -14,6 +14,10 @@ export default class VoxelSpace {
   sizex: number;
   sizey: number;
   sizez: number;
+
+  minx: number;
+  miny: number;
+  minz: number;
   // The list of voxels (tupleToString([x,y,z])) that are non-empty.
   private voxels: Map<string, Voxel>;
 
@@ -39,18 +43,25 @@ export default class VoxelSpace {
     this.sizex = spacex;
     this.sizey = spacey;
     this.sizez = spacez;
-    this.voxels = this.voxelize(geom);
+
+    let dim = this.getMeshDimensions(geom);
+    this.minx = dim[0];
+    this.miny = dim[2];
+    this.minz = dim[4];
+
+    this.voxels = this.voxelize(geom, dim);
   }
 
-  private voxelize(geom: BufferGeometry): Map<string, Voxel> {
+  private voxelize(
+    geom: BufferGeometry,
+    dim: [number, number, number, number, number, number],
+  ): Map<string, Voxel> {
     const voxels: Map<string, Voxel> = new Map();
 
     const mesh = new Mesh(geom);
     mesh.material = new MeshBasicMaterial();
     mesh.material.side = DoubleSide;
     const raycaster = new Raycaster();
-
-    let dim = this.getMeshDimensions(geom);
 
     const stepx = (dim[1] - dim[0]) / this.sizex;
     const stepy = (dim[3] - dim[2]) / this.sizey;
@@ -79,12 +90,12 @@ export default class VoxelSpace {
       let min: Vector3 = geom.boundingBox.min;
       let max: Vector3 = geom.boundingBox.max;
       return [
-        min.x - 0.5,
-        max.x + 0.5,
-        min.y - 0.5,
-        max.y + 0.5,
-        min.z - 0.5,
-        max.z + 0.5,
+        min.x - 0.5, // 0
+        max.x + 0.5, // 1
+        min.y - 0.5, // 2
+        max.y + 0.5, // 3
+        min.z - 0.5, // 4
+        max.z + 0.5, // 5
       ];
     } else {
       return [-50, 50, -50, 50, -50, 50];
@@ -131,7 +142,11 @@ export default class VoxelSpace {
     y2: number,
     z2: number,
   ): Vector3 {
-    return new Vector3((x1 + x2) / 2, (y1 + y2) / 2, (z1 + z2) / 2);
+    return new Vector3(
+      (x1 + x2) / 2 / this.sizex + this.minx,
+      (y1 + y2) / 2 / this.sizey + this.miny,
+      (z1 + z2) / 2 / this.sizez + this.minz,
+    );
   }
 
   // Run marching cubes on the voxelspace and
@@ -149,8 +164,6 @@ export default class VoxelSpace {
     for (let z = 0; z < this.sizez - 1; z++)
       for (let y = 0; y < this.sizey - 1; y++)
         for (let x = 0; x < this.sizex - 1; x++) {
-          if (!this.voxelExists(x, y, z)) continue;
-
           // Check which neighbors exist and build up the corresponding cube mask.
           if (this.voxelExists(x, y, z)) cubeMask |= 1;
           if (this.voxelExists(x + 1, y, z)) cubeMask |= 2;
@@ -166,9 +179,8 @@ export default class VoxelSpace {
           if (bits === 0) continue;
 
           // approximate intersection points
-          let mu = 0.5;
           if (bits & 1) {
-            vlist[0] = this.averageVector(x, y, z, x + 1, y, z);
+            vlist[0] = this.averageVector(x, y, z, x + 1 / this.sizex, y, z);
           }
           if (bits & 2) {
             vlist[1] = this.averageVector(x + 1, y, z, x + 1, y + 1, z);
