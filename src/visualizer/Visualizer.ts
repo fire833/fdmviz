@@ -97,8 +97,7 @@ export default class Visualizer {
     this.scene.add(directLight2);
 
     //Initialize the mesh for the base plate
-    this.grid = new GridHelper(220, 22).translateY(-0.03);
-    this.scene.add(this.grid);
+    this.grid = new GridHelper(220, 22);
 
     // Initialize the group containing the mesh
     this.group = new Group();
@@ -239,20 +238,25 @@ export default class Visualizer {
     geometry: BufferGeometry,
     doSmoothGeometry: boolean = get(smoothGeometry),
   ) {
-    let displayGeometry: BufferGeometry = geometry.clone();
+    let displayGeometry: BufferGeometry;
+    if (get(viewMode) == ViewMode.SIMULATION) {
+      displayGeometry = geometry.clone();
+    } else {
+      displayGeometry = geometry.clone();
+    }
 
+    this.mesh = new Mesh(displayGeometry, undefined);
     if (doSmoothGeometry) {
       displayGeometry = toCreasedNormals(displayGeometry, Math.PI / 5);
       displayGeometry = mergeVertices(displayGeometry);
       displayGeometry.computeVertexNormals(); // Recompute existing vertex normals
     }
-    this.mesh.geometry.dispose();
-    this.mesh.geometry = displayGeometry;
     this.normals = new VertexNormalsHelper(this.mesh, 1, 0xa4036f);
 
     this.group.clear();
     this.group.add(this.mesh);
     this.group.add(this.normals);
+    this.group.add(this.grid);
 
     if (this.normals) this.normals.visible = get(showVertexNormals);
     this.updateMeshMaterial();
@@ -266,18 +270,7 @@ export default class Visualizer {
     // Load STL
     const loader = new STLLoader();
     this.baseGeometry = await loader.loadAsync(fileURL);
-
-    // Center geometry
-    let center: Vector3 = new Vector3();
-    this.baseGeometry.computeBoundingBox();
-    this.baseGeometry.boundingBox?.getCenter(center);
-    let min: Vector3 = this.baseGeometry.boundingBox
-      ? this.baseGeometry.boundingBox.min
-      : new Vector3();
-    this.baseGeometry.translate(-center.x, -center.y, -min.z);
-
-    // Rotate to convert from STL to 3js coordinate system
-    this.baseGeometry.rotateX(-Math.PI / 2);
+    this.baseGeometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
 
     clearLoading(loadingMessage);
   }
@@ -297,6 +290,11 @@ export default class Visualizer {
     this.camera.position.x = center.x; // Aligned with front of object
     this.camera.position.y = center.y + sphere.radius * 0.9; // At the top of the object
     this.camera.position.z = center.z + sphere.radius * 1.8; // 2 radius's back
+
+    //Changes the grid position to be in the same spot as the object itself.
+    this.grid.position.x = center.x;
+    this.grid.position.y = center.y - sphere.center.y;
+    this.grid.position.z = center.z;
   }
 
   public resetPhysics() {
@@ -307,6 +305,11 @@ export default class Visualizer {
   public updateScene() {
     // Update view based on controls (mouse)
     this.controls.update();
+    if (this.controls.getPolarAngle() > Math.PI / 2) {
+      this.grid.visible = false;
+    } else {
+      this.grid.visible = true;
+    }
 
     // Update simulation
     if (get(viewMode) == ViewMode.SIMULATION) {
