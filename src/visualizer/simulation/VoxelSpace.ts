@@ -15,6 +15,10 @@ export default class VoxelSpace {
   sizey: number;
   sizez: number;
 
+  meshstepx: number;
+  meshstepy: number;
+  meshstepz: number;
+
   minx: number;
   miny: number;
   minz: number;
@@ -45,17 +49,22 @@ export default class VoxelSpace {
     this.sizez = spacez;
 
     let dim = this.getMeshDimensions(geom);
+    console.debug(
+      `mesh space: (${dim[0]}, ${dim[2]}, ${dim[4]}) -> (${dim[1]}, ${dim[3]}, ${dim[5]})`,
+    );
+
+    this.meshstepx = (dim[1] - dim[0]) / this.sizex;
+    this.meshstepy = (dim[3] - dim[2]) / this.sizey;
+    this.meshstepz = (dim[5] - dim[4]) / this.sizez;
+
     this.minx = dim[0];
     this.miny = dim[2];
     this.minz = dim[4];
 
-    this.voxels = this.voxelize(geom, dim);
+    this.voxels = this.voxelize(geom);
   }
 
-  private voxelize(
-    geom: BufferGeometry,
-    dim: [number, number, number, number, number, number],
-  ): Map<string, Voxel> {
+  private voxelize(geom: BufferGeometry): Map<string, Voxel> {
     const voxels: Map<string, Voxel> = new Map();
 
     const mesh = new Mesh(geom);
@@ -63,15 +72,12 @@ export default class VoxelSpace {
     mesh.material.side = DoubleSide;
     const raycaster = new Raycaster();
 
-    const stepx = (dim[1] - dim[0]) / this.sizex;
-    const stepy = (dim[3] - dim[2]) / this.sizey;
-    const stepz = (dim[5] - dim[4]) / this.sizez;
     for (let x = 0; x < this.sizex; x++) {
       for (let y = 0; y < this.sizey; y++) {
         for (let z = 0; z < this.sizez; z++) {
-          const nx = x * stepx + this.minx;
-          const ny = x * stepy + this.miny;
-          const nz = x * stepz + this.minz;
+          const nx = x * this.meshstepx + this.minx;
+          const ny = x * this.meshstepy + this.miny;
+          const nz = x * this.meshstepz + this.minz;
           if (this.insideMesh(raycaster, new Vector3(nx, ny, nz), mesh)) {
             // console.log(`found voxel at (${x},${y},${z})`);
             voxels.set(this.tupleToString([x, y, z]), new Voxel(z));
@@ -93,12 +99,12 @@ export default class VoxelSpace {
       let min: Vector3 = geom.boundingBox.min;
       let max: Vector3 = geom.boundingBox.max;
       return [
-        min.x - 0.5, // 0
-        max.x + 0.5, // 1
-        min.y - 0.5, // 2
-        max.y + 0.5, // 3
-        min.z - 0.5, // 4
-        max.z + 0.5, // 5
+        min.x - 0.1, // 0
+        max.x + 0.1, // 1
+        min.y - 0.1, // 2
+        max.y + 0.1, // 3
+        min.z - 0.1, // 4
+        max.z + 0.1, // 5
       ];
     } else {
       return [-50, 50, -50, 50, -50, 50];
@@ -136,8 +142,9 @@ export default class VoxelSpace {
     return tuple.join(',');
   }
 
-  // Computes the average between the two provided vectors.
-  private averageVector(
+  // Computes the average between the two provided vectors, and
+  // denormalizes the vector to fit with the original model space.
+  private denormalizeVector(
     x1: number,
     y1: number,
     z1: number,
@@ -145,10 +152,14 @@ export default class VoxelSpace {
     y2: number,
     z2: number,
   ): Vector3 {
+    let avgx = (x1 + x2) / 2;
+    let avgy = (y1 + y2) / 2;
+    let avgz = (z1 + z2) / 2;
+
     return new Vector3(
-      (2 * (x1 + x2)) / this.sizex + this.minx,
-      (2 * (y1 + y2)) / this.sizey + this.miny,
-      (2 * (z1 + z2)) / this.sizez + this.minz,
+      this.minx + avgx * this.meshstepx,
+      this.miny + avgy * this.meshstepy,
+      this.minz + avgz * this.meshstepz,
     );
   }
 
@@ -185,39 +196,53 @@ export default class VoxelSpace {
 
           // approximate intersection points
           if (bits & 1) {
-            vlist[0] = this.averageVector(x, y, z, x + 1, y, z);
+            vlist[0] = this.denormalizeVector(x, y, z, x + 1, y, z);
           }
           if (bits & 2) {
-            vlist[1] = this.averageVector(x + 1, y, z, x + 1, y + 1, z);
+            vlist[1] = this.denormalizeVector(x + 1, y, z, x + 1, y + 1, z);
           }
           if (bits & 4) {
-            vlist[2] = this.averageVector(x, y + 1, z, x + 1, y + 1, z);
+            vlist[2] = this.denormalizeVector(x, y + 1, z, x + 1, y + 1, z);
           }
           if (bits & 8) {
-            vlist[3] = this.averageVector(x, y, z, x, y + 1, z);
+            vlist[3] = this.denormalizeVector(x, y, z, x, y + 1, z);
           }
           // top of the cube
           if (bits & 16) {
-            vlist[4] = this.averageVector(x, y, z + 1, x + 1, y, z + 1);
+            vlist[4] = this.denormalizeVector(x, y, z + 1, x + 1, y, z + 1);
           }
           if (bits & 32) {
-            vlist[5] = this.averageVector(x + 1, y, z + 1, x + 1, y + 1, z + 1);
+            vlist[5] = this.denormalizeVector(
+              x + 1,
+              y,
+              z + 1,
+              x + 1,
+              y + 1,
+              z + 1,
+            );
           }
           if (bits & 64) {
-            vlist[6] = this.averageVector(x, y + 1, z + 1, x + 1, y + 1, z + 1);
+            vlist[6] = this.denormalizeVector(
+              x,
+              y + 1,
+              z + 1,
+              x + 1,
+              y + 1,
+              z + 1,
+            );
           }
           if (bits & 128) {
-            vlist[7] = this.averageVector(x, y, z + 1, x, y + 1, z + 1);
+            vlist[7] = this.denormalizeVector(x, y, z + 1, x, y + 1, z + 1);
           }
           // vertical lines of the cube
           if (bits & 256) {
-            vlist[8] = this.averageVector(x, y, z, x, y, z + 1);
+            vlist[8] = this.denormalizeVector(x, y, z, x, y, z + 1);
           }
           if (bits & 512) {
-            vlist[9] = this.averageVector(x + 1, y, z, x + 1, y, z + 1);
+            vlist[9] = this.denormalizeVector(x + 1, y, z, x + 1, y, z + 1);
           }
           if (bits & 1024) {
-            vlist[10] = this.averageVector(
+            vlist[10] = this.denormalizeVector(
               x + 1,
               y + 1,
               z,
@@ -227,7 +252,7 @@ export default class VoxelSpace {
             );
           }
           if (bits & 2048) {
-            vlist[11] = this.averageVector(x, y + 1, z, x, y + 1, z + 1);
+            vlist[11] = this.denormalizeVector(x, y + 1, z, x, y + 1, z + 1);
           }
 
           // lookup triangles
@@ -257,7 +282,7 @@ export default class VoxelSpace {
           }
         }
 
-    console.log(
+    console.debug(
       `computed is ${vertices.length} and is ${vertices.length / 3} size`,
     );
 
@@ -269,6 +294,13 @@ export default class VoxelSpace {
     geom.computeVertexNormals();
     geom.getAttribute('position').needsUpdate = true;
     geom.getAttribute('normal').needsUpdate = true;
+
+    geom.computeBoundingBox();
+    let min = geom.boundingBox?.min;
+    let max = geom.boundingBox?.max;
+    console.debug(
+      `voxel space: (${min?.x}, ${min?.y}, ${min?.z}) -> (${max?.x}, ${max?.y}, ${max?.z})`,
+    );
 
     // Return the computed geometry.
     return geom;
