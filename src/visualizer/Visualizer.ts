@@ -266,7 +266,18 @@ export default class Visualizer {
     // Load STL
     const loader = new STLLoader();
     this.baseGeometry = await loader.loadAsync(fileURL);
-    this.baseGeometry.rotateX(-Math.PI / 2); // Change coordinate system from STL to 3js
+
+    // Center geometry
+    let center: Vector3 = new Vector3();
+    this.baseGeometry.computeBoundingBox();
+    this.baseGeometry.boundingBox?.getCenter(center);
+    let min: Vector3 = this.baseGeometry.boundingBox
+      ? this.baseGeometry.boundingBox.min
+      : new Vector3();
+    this.baseGeometry.translate(-center.x, -center.y, -min.z);
+
+    // Rotate to convert from STL to 3js coordinate system
+    this.baseGeometry.rotateX(-Math.PI / 2);
 
     clearLoading(loadingMessage);
   }
