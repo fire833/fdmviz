@@ -97,7 +97,7 @@ export default class Visualizer {
     this.scene.add(directLight2);
 
     //Initialize the mesh for the base plate
-    this.grid = new GridHelper(220, 22);
+    this.grid = new GridHelper(220, 22).translateY(-0.03);
     this.scene.add(this.grid);
 
     // Initialize the group containing the mesh
@@ -296,7 +296,6 @@ export default class Visualizer {
   public updateScene() {
     // Update view based on controls (mouse)
     this.controls.update();
-    this.grid.visible = true;
 
     // Update simulation
     if (get(viewMode) == ViewMode.SIMULATION) {
