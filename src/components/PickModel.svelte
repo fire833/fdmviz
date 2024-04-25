@@ -1,8 +1,5 @@
 <script lang="ts">
-    import { onDestroy } from 'svelte';
-  import { fileURL, openModal } from '../stores';
-    import { modelScale } from 'three/examples/jsm/nodes/Nodes.js';
-    import { DodecahedronGeometry } from 'three';
+  import { fileURL } from '../stores';
 
   enum Mode {
     Preset,
@@ -28,7 +25,6 @@
   ];
 
   let textInput: string;
-  let shown: boolean;
 
   function updateModel(url: string) {
     fileURL.set(url); // Set the URL
@@ -47,6 +43,7 @@
   }
 
   let dialog: HTMLDialogElement;
+
   export function showModal() {
     dialog.showModal();
   }
@@ -56,61 +53,81 @@
     dialog.close();
   }
 
-</script>
-<dialog bind:this={dialog}>
-  <div class="ui">
-    <div class = "close" on:click = {() => hide()}>
-      &times;
-    </div>
-    <h1>Choose an STL Model</h1>
-    <div class="modes">
-      <button
-        on:click={() => {
-          mode = Mode.Preset;
-        }}>Preset</button
-      >
-      <button
-        on:click={() => {
-          mode = Mode.Upload;
-        }}>Upload</button
-      >
-      <button
-        on:click={() => {
-          mode = Mode.URL;
-        }}>URL</button
-      >
-    </div>
-    <div class="section">
-      {#if mode == Mode.Preset}
-        <p>Pick a preset 3D Model</p>
-        <div class="list">
-          {#each presets as [name, url]}
-            <button class="list-item" on:click={() => updateModel(url)}>
-              {name}
-            </button>
-          {/each}
-        </div>
-      {:else if mode == Mode.Upload}
-        <p>Upload an STL model</p>
-        <button on:click={() => fileButton.click()}>Pick file</button>
-        <input
-          type="file"
-          bind:this={fileButton}
-          bind:files={fileUploads}
-          accept=".stl"
-        />
-      {:else}
-        <p>Enter a URL to an STL file</p>
-        <form on:submit|preventDefault={() => updateModel(textInput)}>
-          <input type="text" placeholder="https://" bind:value={textInput} />
-        </form>
-      {/if}
-    </div>
-  </div>
-</dialog>
+  function handleDialogClick(event: Event){
+    if(event.target && event.target == dialog) hide();
+  }
 
+</script>
+
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div class="dialog-parent" on:click={(event)=>{handleDialogClick(event)}}>
+  <dialog bind:this={dialog}>
+    <div class="ui">
+      <h1>Choose an STL Model</h1>
+      <div class="modes">
+        <button
+          on:click={() => {
+            mode = Mode.Preset;
+          }}>Preset</button
+        >
+        <button
+          on:click={() => {
+            mode = Mode.Upload;
+          }}>Upload</button
+        >
+        <button
+          on:click={() => {
+            mode = Mode.URL;
+          }}>URL</button
+        >
+      </div>
+      <div class="section">
+        {#if mode == Mode.Preset}
+          <p>Pick a preset 3D Model</p>
+          <div class="list">
+            {#each presets as [name, url]}
+              <button class="list-item" on:click={() => updateModel(url)}>
+                {name}
+              </button>
+            {/each}
+          </div>
+        {:else if mode == Mode.Upload}
+          <p>Upload an STL model</p>
+          <button on:click={() => fileButton.click()}>Pick file</button>
+          <input
+            type="file"
+            bind:this={fileButton}
+            bind:files={fileUploads}
+            accept=".stl"
+          />
+        {:else}
+          <p>Enter a URL to an STL file</p>
+          <form on:submit|preventDefault={() => updateModel(textInput)}>
+            <input type="text" placeholder="https://" bind:value={textInput} />
+          </form>
+        {/if}
+      </div>
+    </div>
+  </dialog>
+</div>
 
 <style>
+  .dialog-parent {
+    pointer-events: all;
+		visibility: hidden;
+		z-index: 100;
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+  }
+
   dialog {
     border: none;
     background: none;
@@ -159,15 +176,5 @@
 
   input[type='file'] {
     display: none;
-  }
-  .close{
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    float:right;
-    cursor: pointer;
-  }
-  .close:hover{
-    font-weight: bold;
   }
 </style>
