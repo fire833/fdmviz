@@ -239,19 +239,15 @@ export default class Visualizer {
     geometry: BufferGeometry,
     doSmoothGeometry: boolean = get(smoothGeometry),
   ) {
-    let displayGeometry: BufferGeometry;
-    if (get(viewMode) == ViewMode.SIMULATION) {
-      displayGeometry = geometry.clone();
-    } else {
-      displayGeometry = geometry.clone();
-    }
+    let displayGeometry: BufferGeometry = geometry.clone();
 
-    this.mesh = new Mesh(displayGeometry, undefined);
     if (doSmoothGeometry) {
       displayGeometry = toCreasedNormals(displayGeometry, Math.PI / 5);
       displayGeometry = mergeVertices(displayGeometry);
       displayGeometry.computeVertexNormals(); // Recompute existing vertex normals
     }
+    this.mesh.geometry.dispose();
+    this.mesh.geometry = displayGeometry;
     this.normals = new VertexNormalsHelper(this.mesh, 1, 0xa4036f);
 
     this.group.clear();
@@ -300,11 +296,8 @@ export default class Visualizer {
   public updateScene() {
     // Update view based on controls (mouse)
     this.controls.update();
-    if (this.controls.getPolarAngle() > Math.PI / 2) {
-      this.grid.visible = false;
-    } else {
-      this.grid.visible = true;
-    }
+    this.grid.visible = true;
+
     // Update simulation
     if (get(viewMode) == ViewMode.SIMULATION) {
       this.simulator.update(this.clock.getDelta() * this.simSpeed); // Update the physics model
