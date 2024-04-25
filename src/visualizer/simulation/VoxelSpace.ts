@@ -1,11 +1,14 @@
 import {
   BufferGeometry,
   DoubleSide,
+  DynamicDrawUsage,
+  Float32BufferAttribute,
   Mesh,
   MeshBasicMaterial,
   Raycaster,
   Vector3,
 } from 'three';
+import { edgeTable, triTable } from './LookUpTable';
 
 export default class VoxelSpace {
   sizex: number;
@@ -119,120 +122,143 @@ export default class VoxelSpace {
     return tuple.join(',');
   }
 
-  // // Run marching cubes on the voxelspace and
-  // // compute the corresponding BufferGeometry.
-  // public exportGeometry(): BufferGeometry {
-  //   let geom = new BufferGeometry();
-  //   // approximated intersection points
-  //   let vlist: Array<Vector3> = new Array(12);
-  //   // The mask used for checking intersection.
-  //   let cubeMask = 0;
+  // Computes the average between the two provided vectors.
+  private averageVector(
+    x1: number,
+    y1: number,
+    z1: number,
+    x2: number,
+    y2: number,
+    z2: number,
+  ): Vector3 {
+    return new Vector3((x1 + x2) / 2, (y1 + y2) / 2, (z1 + z2) / 2);
+  }
 
-  //   // TODO: need to statically allocate this, probably
-  //   let vertices: Vector3[] = [];
+  // Run marching cubes on the voxelspace and
+  // compute the corresponding BufferGeometry.
+  public exportGeometry(): BufferGeometry {
+    let geom = new BufferGeometry();
+    // approximated intersection points
+    let vlist: Array<Vector3> = new Array<Vector3>(12);
+    // The mask used for checking intersection.
+    let cubeMask = 0;
 
-  //   for (let z = 0; z < this.sizez - 1; z++)
-  //     for (let y = 0; y < this.sizey - 1; y++)
-  //       for (let x = 0; x < this.sizex - 1; x++) {
-  //         if (!this.voxelExists(x, y, z)) continue;
+    // TODO: need to statically allocate this, probably
+    let vertices: number[] = [];
 
-  //         // Check which neighbors exist and build up the corresponding cube mask.
-  //         if (this.voxelExists(x, y, z)) cubeMask |= 1;
-  //         if (this.voxelExists(x + 1, y, z)) cubeMask |= 2;
-  //         if (this.voxelExists(x, y + 1, z)) cubeMask |= 8;
-  //         if (this.voxelExists(x + 1, y + 1, z)) cubeMask |= 4;
-  //         if (this.voxelExists(x, y + 2, z)) cubeMask |= 8;
+    for (let z = 0; z < this.sizez - 1; z++)
+      for (let y = 0; y < this.sizey - 1; y++)
+        for (let x = 0; x < this.sizex - 1; x++) {
+          if (!this.voxelExists(x, y, z)) continue;
 
-  //         // lookup edges
-  //         let bits = edgeTable[cubeMask];
-  //         if (bits === 0) continue;
+          // Check which neighbors exist and build up the corresponding cube mask.
+          if (this.voxelExists(x, y, z)) cubeMask |= 1;
+          if (this.voxelExists(x + 1, y, z)) cubeMask |= 2;
+          if (this.voxelExists(x, y + 1, z)) cubeMask |= 8;
+          if (this.voxelExists(x + 1, y + 1, z)) cubeMask |= 4;
+          if (this.voxelExists(x, y, z + 1)) cubeMask |= 16;
+          if (this.voxelExists(x + 1, y, z + 1)) cubeMask |= 32;
+          if (this.voxelExists(x, y + 1, z + 1)) cubeMask |= 128;
+          if (this.voxelExists(x + 1, y + 1, z + 1)) cubeMask |= 64;
 
-  //         // approximate intersection points
-  //         let mu = 0.5;
-  //         if (bits & 1) {
-  //           mu = (this.isolevel - value0) / (value1 - value0);
-  //           vlist[0] = points[p].clone().lerp(points[px], mu);
-  //         }
-  //         if (bits & 2) {
-  //           mu = (this.isolevel - value1) / (value3 - value1);
-  //           vlist[1] = points[px].clone().lerp(points[pxy], mu);
-  //         }
-  //         if (bits & 4) {
-  //           mu = (this.isolevel - value2) / (value3 - value2);
-  //           vlist[2] = points[py].clone().lerp(points[pxy], mu);
-  //         }
-  //         if (bits & 8) {
-  //           mu = (this.isolevel - value0) / (value2 - value0);
-  //           vlist[3] = points[p].clone().lerp(points[py], mu);
-  //         }
-  //         // top of the cube
-  //         if (bits & 16) {
-  //           mu = (this.isolevel - value4) / (value5 - value4);
-  //           vlist[4] = points[pz].clone().lerp(points[pxz], mu);
-  //         }
-  //         if (bits & 32) {
-  //           mu = (this.isolevel - value5) / (value7 - value5);
-  //           vlist[5] = points[pxz].clone().lerp(points[pxyz], mu);
-  //         }
-  //         if (bits & 64) {
-  //           mu = (this.isolevel - value6) / (value7 - value6);
-  //           vlist[6] = points[pyz].clone().lerp(points[pxyz], mu);
-  //         }
-  //         if (bits & 128) {
-  //           mu = (this.isolevel - value4) / (value6 - value4);
-  //           vlist[7] = points[pz].clone().lerp(points[pyz], mu);
-  //         }
-  //         // vertical lines of the cube
-  //         if (bits & 256) {
-  //           mu = (this.isolevel - value0) / (value4 - value0);
-  //           vlist[8] = points[p].clone().lerp(points[pz], mu);
-  //         }
-  //         if (bits & 512) {
-  //           mu = (this.isolevel - value1) / (value5 - value1);
-  //           vlist[9] = points[px].clone().lerp(points[pxz], mu);
-  //         }
-  //         if (bits & 1024) {
-  //           mu = (this.isolevel - value3) / (value7 - value3);
-  //           vlist[10] = points[pxy].clone().lerp(points[pxyz], mu);
-  //         }
-  //         if (bits & 2048) {
-  //           mu = (this.isolevel - value2) / (value6 - value2);
-  //           vlist[11] = points[py].clone().lerp(points[pyz], mu);
-  //         }
+          // lookup edges
+          let bits = edgeTable[cubeMask];
+          if (bits === 0) continue;
 
-  //         // lookup triangles
-  //         let i = 0;
-  //         cubeMask <<= 4; // multiply by 16...
-  //         while (triTable[cubeMask + i] != -1) {
-  //           var index1 = triTable[cubeMask + i];
-  //           var index2 = triTable[cubeMask + i + 1];
-  //           var index3 = triTable[cubeMask + i + 2];
+          // approximate intersection points
+          let mu = 0.5;
+          if (bits & 1) {
+            vlist[0] = this.averageVector(x, y, z, x + 1, y, z);
+          }
+          if (bits & 2) {
+            vlist[1] = this.averageVector(x + 1, y, z, x + 1, y + 1, z);
+          }
+          if (bits & 4) {
+            vlist[2] = this.averageVector(x, y + 1, z, x + 1, y + 1, z);
+          }
+          if (bits & 8) {
+            vlist[3] = this.averageVector(x, y, z, x, y + 1, z);
+          }
+          // top of the cube
+          if (bits & 16) {
+            vlist[4] = this.averageVector(x, y, z + 1, x + 1, y, z + 1);
+          }
+          if (bits & 32) {
+            vlist[5] = this.averageVector(x + 1, y, z + 1, x + 1, y + 1, z + 1);
+          }
+          if (bits & 64) {
+            vlist[6] = this.averageVector(x, y + 1, z + 1, x + 1, y + 1, z + 1);
+          }
+          if (bits & 128) {
+            vlist[7] = this.averageVector(x, y, z + 1, x, y + 1, z + 1);
+          }
+          // vertical lines of the cube
+          if (bits & 256) {
+            vlist[8] = this.averageVector(x, y, z, x, y, z + 1);
+          }
+          if (bits & 512) {
+            vlist[9] = this.averageVector(x + 1, y, z, x + 1, y, z + 1);
+          }
+          if (bits & 1024) {
+            vlist[10] = this.averageVector(
+              x + 1,
+              y + 1,
+              z,
+              x + 1,
+              y + 1,
+              z + 1,
+            );
+          }
+          if (bits & 2048) {
+            vlist[11] = this.averageVector(x, y + 1, z, x, y + 1, z + 1);
+          }
 
-  //           vertices.push(vlist[index1], vlist[index2], vlist[index3]);
+          // lookup triangles
+          let i = 0;
+          cubeMask <<= 4; // multiply by 16...
+          while (triTable[cubeMask + i] != -1) {
+            let index1 = triTable[cubeMask + i];
+            let index2 = triTable[cubeMask + i + 1];
+            let index3 = triTable[cubeMask + i + 2];
+            let val1 = vlist[index1];
+            let val2 = vlist[index2];
+            let val3 = vlist[index3];
 
-  //           trianglePoints.push(vlist[index1].clone());
-  //           trianglePoints.push(vlist[index2].clone());
-  //           trianglePoints.push(vlist[index3].clone());
+            vertices.push(
+              val1.x,
+              val1.y,
+              val1.z,
+              val2.x,
+              val2.y,
+              val2.z,
+              val3.x,
+              val3.y,
+              val3.z,
+            );
 
-  //           i += 3;
-  //         }
+            i += 3;
+          }
 
-  //         cubeMask = 0;
-  //         vlist.fill(0);
-  //       }
+          cubeMask = 0;
+          vlist = new Array(12);
+        }
 
-  //   // Update mesh with new triangles
-  //   const positionAttribute = new Float32BufferAttribute(vertices, 3);
-  //   positionAttribute.setUsage(DynamicDrawUsage);
-  //   geometry.setAttribute('position', positionAttribute);
-  //   geometry.setDrawRange(0, trianglePoints.length);
-  //   geometry.computeVertexNormals();
-  //   geometry.getAttribute('position').needsUpdate = true;
-  //   geometry.getAttribute('normal').needsUpdate = true;
+    console.log(
+      `computed is ${vertices.length} and is ${vertices.length / 3} size`,
+    );
 
-  //   // Return the computed geometry.
-  //   return geom;
-  // }
+    // Update mesh with new triangles
+    const positionAttribute = new Float32BufferAttribute(vertices, 3);
+    positionAttribute.setUsage(DynamicDrawUsage);
+    geom.setAttribute('position', positionAttribute);
+    geom.setDrawRange(0, vertices.length);
+    geom.computeVertexNormals();
+    geom.getAttribute('position').needsUpdate = true;
+    geom.getAttribute('normal').needsUpdate = true;
+
+    // Return the computed geometry.
+    return geom;
+  }
 }
 
 // The primary class containing any useful state for a Voxel within
