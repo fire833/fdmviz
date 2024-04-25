@@ -1,5 +1,8 @@
 <script lang="ts">
+    import { onDestroy } from 'svelte';
   import { fileURL, openModal } from '../stores';
+    import { modelScale } from 'three/examples/jsm/nodes/Nodes.js';
+    import { DodecahedronGeometry } from 'three';
 
   enum Mode {
     Preset,
@@ -25,6 +28,7 @@
   ];
 
   let textInput: string;
+  let shown: boolean;
 
   function updateModel(url: string) {
     fileURL.set(url); // Set the URL
@@ -46,10 +50,18 @@
   export function showModal() {
     dialog.showModal();
   }
-</script>
 
+  export function hide()
+  {
+    dialog.close();
+  }
+
+</script>
 <dialog bind:this={dialog}>
   <div class="ui">
+    <div class = "close" on:click = {() => hide()}>
+      &times;
+    </div>
     <h1>Choose an STL Model</h1>
     <div class="modes">
       <button
@@ -96,6 +108,7 @@
     </div>
   </div>
 </dialog>
+
 
 <style>
   dialog {
@@ -146,5 +159,15 @@
 
   input[type='file'] {
     display: none;
+  }
+  .close{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    float:right;
+    cursor: pointer;
+  }
+  .close:hover{
+    font-weight: bold;
   }
 </style>
