@@ -1,24 +1,24 @@
 import { Vector3 } from 'three';
 import { edgeTable, triTable } from './LookUpTable';
 
-export const resolution = 40;
+export const resolution = 25;
 export const scale = 10;
 const isolevel = 0.5;
 
 // Returns a list of vectors, to be grouped as the triplets which are the vertices of each face
 export function marchingCubes(points: Vector3[], values: number[]): Vector3[] {
   // approximated intersection points
-  var vlist = new Array(12);
+  var vlist: Array<Vector3> = new Array(12);
   // resolution^2
   const resolution2 = resolution * resolution;
   // mesh triangles
   let trianglePoints: Vector3[] = [];
 
-  for (var z = 0; z < resolution - 1; z++)
-    for (var y = 0; y < resolution - 1; y++)
-      for (var x = 0; x < resolution - 1; x++) {
+  for (let z = 0; z < resolution - 1; z++)
+    for (let y = 0; y < resolution - 1; y++)
+      for (let x = 0; x < resolution - 1; x++) {
         // indexes of points in the cube
-        var p = x + resolution * y + resolution2 * z,
+        let p = x + resolution * y + resolution2 * z,
           px = p + 1,
           py = p + resolution,
           pxy = py + 1,
@@ -28,7 +28,7 @@ export function marchingCubes(points: Vector3[], values: number[]): Vector3[] {
           pxyz = pxy + resolution2;
 
         // store scalar values corresponding to vertices
-        var value0 = values[p],
+        let value0 = values[p],
           value1 = values[px],
           value2 = values[py],
           value3 = values[pxy],
@@ -38,7 +38,7 @@ export function marchingCubes(points: Vector3[], values: number[]): Vector3[] {
           value7 = values[pxyz];
 
         // cubeindex
-        var cubeindex = 0;
+        let cubeindex = 0;
         if (value0 < isolevel) cubeindex |= 1;
         if (value1 < isolevel) cubeindex |= 2;
         if (value2 < isolevel) cubeindex |= 8;
@@ -49,11 +49,11 @@ export function marchingCubes(points: Vector3[], values: number[]): Vector3[] {
         if (value7 < isolevel) cubeindex |= 64;
 
         // lookup edges
-        var bits = edgeTable[cubeindex];
+        let bits = edgeTable[cubeindex];
         if (bits === 0) continue;
 
         // approximate intersection points
-        var mu = 0.5;
+        let mu = 0.5;
         if (bits & 1) {
           mu = (isolevel - value0) / (value1 - value0);
           vlist[0] = points[p].clone().lerp(points[px], mu);
@@ -106,7 +106,7 @@ export function marchingCubes(points: Vector3[], values: number[]): Vector3[] {
         }
 
         // lookup triangles
-        var i = 0;
+        let i = 0;
         cubeindex <<= 4; // multiply by 16...
         while (triTable[cubeindex + i] != -1) {
           var index1 = triTable[cubeindex + i];
