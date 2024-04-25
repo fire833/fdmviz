@@ -66,10 +66,13 @@ export default class VoxelSpace {
     const stepx = (dim[1] - dim[0]) / this.sizex;
     const stepy = (dim[3] - dim[2]) / this.sizey;
     const stepz = (dim[5] - dim[4]) / this.sizez;
-    for (let x = dim[0]; x < dim[1]; x += stepx) {
-      for (let y = dim[2]; y < dim[3]; y += stepy) {
-        for (let z = dim[4]; z < dim[5]; z += stepz) {
-          if (this.insideMesh(raycaster, new Vector3(x, y, z), mesh)) {
+    for (let x = 0; x < this.sizex; x++) {
+      for (let y = 0; y < this.sizey; y++) {
+        for (let z = 0; z < this.sizez; z++) {
+          const nx = x * stepx + this.minx;
+          const ny = x * stepy + this.miny;
+          const nz = x * stepz + this.minz;
+          if (this.insideMesh(raycaster, new Vector3(nx, ny, nz), mesh)) {
             // console.log(`found voxel at (${x},${y},${z})`);
             voxels.set(this.tupleToString([x, y, z]), new Voxel(z));
           }
@@ -143,9 +146,9 @@ export default class VoxelSpace {
     z2: number,
   ): Vector3 {
     return new Vector3(
-      (x1 + x2) / 2 / this.sizex + this.minx,
-      (y1 + y2) / 2 / this.sizey + this.miny,
-      (z1 + z2) / 2 / this.sizez + this.minz,
+      (2 * (x1 + x2)) / this.sizex + this.minx,
+      (2 * (y1 + y2)) / this.sizey + this.miny,
+      (2 * (z1 + z2)) / this.sizez + this.minz,
     );
   }
 
@@ -155,8 +158,6 @@ export default class VoxelSpace {
     let geom = new BufferGeometry();
     // approximated intersection points
     let vlist: Array<Vector3> = new Array<Vector3>(12);
-    // The mask used for checking intersection.
-    let cubeMask = 0;
 
     // TODO: need to statically allocate this, probably
     let vertices: number[] = [];
@@ -164,6 +165,10 @@ export default class VoxelSpace {
     for (let z = 0; z < this.sizez - 1; z++)
       for (let y = 0; y < this.sizey - 1; y++)
         for (let x = 0; x < this.sizex - 1; x++) {
+          if (!this.voxelExists(x, y, z)) continue;
+          // The mask used for checking intersection.
+          let cubeMask = 0;
+
           // Check which neighbors exist and build up the corresponding cube mask.
           if (this.voxelExists(x, y, z)) cubeMask |= 1;
           if (this.voxelExists(x + 1, y, z)) cubeMask |= 2;
@@ -180,7 +185,7 @@ export default class VoxelSpace {
 
           // approximate intersection points
           if (bits & 1) {
-            vlist[0] = this.averageVector(x, y, z, x + 1 / this.sizex, y, z);
+            vlist[0] = this.averageVector(x, y, z, x + 1, y, z);
           }
           if (bits & 2) {
             vlist[1] = this.averageVector(x + 1, y, z, x + 1, y + 1, z);
@@ -250,9 +255,6 @@ export default class VoxelSpace {
 
             i += 3;
           }
-
-          cubeMask = 0;
-          vlist = new Array(12);
         }
 
     console.log(
