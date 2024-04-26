@@ -7,6 +7,8 @@ import {
   Vector3,
 } from 'three';
 
+export const defaultResolution = 30;
+
 export default class VoxelSpace {
   sizex: number;
   sizey: number;
@@ -27,9 +29,9 @@ export default class VoxelSpace {
   // Build a new voxelspace by a voxelizing BufferGeometry.
   constructor(
     geom: BufferGeometry,
-    spacex: number = 40,
-    spacey: number = 40,
-    spacez: number = 40,
+    spacex: number = defaultResolution,
+    spacey: number = defaultResolution,
+    spacez: number = defaultResolution,
   ) {
     this.sizex = spacex;
     this.sizey = spacey;
@@ -45,9 +47,9 @@ export default class VoxelSpace {
     mesh.material.side = DoubleSide;
     const raycaster = new Raycaster();
 
-    for (let x = 0; x < this.sizex; x++) {
-      for (let y = 0; y < this.sizey; y++) {
-        for (let z = 0; z < this.sizez; z++) {
+    for (let x = -(this.sizex / 2); x < this.sizex / 2; x++) {
+      for (let y = -(this.sizey / 2); y < this.sizey / 2; y++) {
+        for (let z = -(this.sizez / 2); z < this.sizez / 2; z++) {
           if (this.insideMesh(raycaster, new Vector3(x, y, z), mesh)) {
             voxels.set(this.tupleToString([x, y, z]), new Voxel(z));
           }

@@ -1,7 +1,7 @@
 import { Vector3 } from 'three';
 import { edgeTable, triTable } from './LookUpTable';
+import { defaultResolution } from './VoxelSpace';
 
-export const resolution = 40;
 export const scale = 10;
 const isolevel = 0.5;
 
@@ -10,17 +10,17 @@ export function marchingCubes(points: Vector3[], values: number[]): Vector3[] {
   // approximated intersection points
   var vlist = new Array(12);
   // resolution^2
-  const resolution2 = resolution * resolution;
+  const resolution2 = defaultResolution * defaultResolution;
   // mesh triangles
   let trianglePoints: Vector3[] = [];
 
-  for (var z = 0; z < resolution - 1; z++)
-    for (var y = 0; y < resolution - 1; y++)
-      for (var x = 0; x < resolution - 1; x++) {
+  for (var z = 0; z < defaultResolution; z++)
+    for (var y = 0; y < defaultResolution; y++)
+      for (var x = 0; x < defaultResolution; x++) {
         // indexes of points in the cube
-        var p = x + resolution * y + resolution2 * z,
+        var p = x + defaultResolution * y + resolution2 * z,
           px = p + 1,
-          py = p + resolution,
+          py = p + defaultResolution,
           pxy = py + 1,
           pz = p + resolution2,
           pxz = px + resolution2,
