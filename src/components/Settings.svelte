@@ -84,7 +84,7 @@
             max="4.0"
             step="0.25"
           />
-          <div class="align">Voxel Space Size</div>
+          <!-- <div class="align">Voxel Space Size</div>
           <input
             type="number"
             bind:value={$spaceDim}
@@ -101,7 +101,7 @@
             max="400"
             step="10"
             disabled
-          />
+          /> -->
         {/if}
       </div>
     </div>
@@ -149,7 +149,7 @@
       </div>
     {/if}
     {#if $viewMode === ViewMode.SIMULATION}
-      <div class="left">
+      <!-- <div class="left">
         <input
           type="checkbox"
           id="melty"
@@ -174,7 +174,7 @@
           disabled
         />
         <label for="transfer">Thermal Transfer</label>
-      </div>
+      </div> -->
     {/if}
   </div>
 </div>
