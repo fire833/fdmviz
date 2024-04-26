@@ -80,7 +80,7 @@
           <input
             type="number"
             bind:value={$simSpeed}
-            min="0.25"
+            min="0"
             max="4.0"
             step="0.25"
           />
