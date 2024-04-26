@@ -41,11 +41,11 @@
     {/key}
     <div class="center">Step</div>
   </button>
-
+  <!-- 
   <button on:click={() => $visualizer.resetPhysics()}>
     <ResetIcon />
     <div class="center">Reset</div>
-  </button>
+  </button> -->
 </div>
 
 <style>
