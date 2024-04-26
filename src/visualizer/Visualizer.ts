@@ -239,7 +239,7 @@ export default class Visualizer {
     geometry: BufferGeometry,
     doSmoothGeometry: boolean = get(smoothGeometry),
   ) {
-    let displayGeometry: BufferGeometry = geometry.clone();
+    let displayGeometry: BufferGeometry = geometry;
 
     if (doSmoothGeometry) {
       displayGeometry = toCreasedNormals(displayGeometry, Math.PI / 5);
@@ -312,12 +312,14 @@ export default class Visualizer {
   public updateScene() {
     // Update view based on controls (mouse)
     this.controls.update();
+  }
 
+  public updatePhysics() {
     // Update simulation
-    if (get(viewMode) == ViewMode.SIMULATION) {
-      this.simulator.update(this.clock.getDelta() * this.simSpeed); // Update the physics model
-      this.populateObject(this.simulator.getGeometry()); // Regenerate the mesh based on the simulator state
-    }
+    // if (get(viewMode) === ViewMode.SIMULATION) {
+    this.simulator.update(this.clock.getDelta() * this.simSpeed); // Update the physics model
+    this.populateObject(this.simulator.getGeometry()); // Regenerate the mesh based on the simulator state
+    // }
   }
 
   public animate() {

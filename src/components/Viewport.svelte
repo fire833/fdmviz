@@ -1,12 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import Visualizer from '../visualizer/Visualizer';
+  import { visualizer } from '../stores';
 
   let container: HTMLElement;
-  let sim = new Visualizer();
 
   onMount(() => {
-    container.appendChild(sim.getHTMLElement());
+    container.appendChild($visualizer.getHTMLElement());
 
     // Disable HMR for this component
     // So that the whole page is reloaded if the Visualizer is changed
@@ -16,7 +15,6 @@
         window.location.reload();
       });
     }
-  
   });
 </script>
 

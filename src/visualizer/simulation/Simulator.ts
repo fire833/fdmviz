@@ -17,7 +17,9 @@ export default class Simulator {
   constructor(geom: BufferGeometry) {
     this.geometry = null;
     this.reset();
+    console.time('createVoxelSpace');
     this.voxelSpace = new VoxelSpace(geom);
+    console.timeEnd('createVoxelSpace');
     this.generateVoxels();
   }
 
@@ -25,7 +27,17 @@ export default class Simulator {
   public reset() {}
 
   // Step the simulator forward by (delta) time
-  public update(delta: number) {}
+  public update(delta: number) {
+    if (this.voxelSpace) {
+      console.debug('stepping through gravity in the fluid simulation');
+      console.time('gravityStep');
+      this.voxelSpace.stepGravity();
+      console.timeEnd('gravityStep');
+      console.time('temperatureStep');
+      this.voxelSpace.stepTemperature();
+      console.timeEnd('temperatureStep');
+    }
+  }
 
   generateVoxels(): void {
     this.points = [];
@@ -75,15 +87,14 @@ export default class Simulator {
       `generated cubes mesh: (${min?.x}, ${min?.y}, ${min?.z}) -> (${max?.x}, ${max?.y}, ${max?.z})`,
     );
 
-    if (this.geometry) this.geometry.dispose();
-    this.geometry = geometry;
     return geometry;
   }
 
   getGeometry(): BufferGeometry {
-    // Return memoized geometry
-    if (this.geometry) return this.geometry;
     // Return generated geometry
-    else return this.generateGeometry();
+    console.time('generateGeometry');
+    let geom = this.generateGeometry();
+    console.timeEnd('generateGeometry');
+    return geom;
   }
 }

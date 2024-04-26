@@ -1,14 +1,8 @@
-import { writable } from 'svelte/store';
+import { writable, type Writable } from 'svelte/store';
 import { ViewMode } from './types';
+import Visualizer from './visualizer/Visualizer';
 
 const fileURLKey: string = 'fileURL';
-const orbitKey: string = 'orbit';
-const showVertexNormalsKey: string = 'showVertexNormals';
-const showSurfaceNormalsKey: string = 'showSurfaceNormals';
-const showSurfaceUVsKey: string = 'showSurfaceUVs';
-const smoothGeometryKey: string = 'smoothGeometry';
-
-export const openModal = writable<boolean>(false);
 
 // Store for the FileURL
 export const fileURL = writable<string>(
@@ -30,56 +24,34 @@ export const spaceDim = writable<number>(25); // Dimension of voxel space
 
 // Features
 
+function createBooleanStore(key: string, defVal: boolean): Writable<boolean> {
+  if (!localStorage.getItem(key))
+    localStorage.setItem(key, defVal ? 'true' : 'false'); // Set the default value in the store
+  const store = writable(localStorage.getItem(key) === 'true');
+  store.subscribe((val) => {
+    localStorage.setItem(key, val ? 'true' : 'false');
+  });
+  return store;
+}
+
 // Orbit boolean
-if (!localStorage.getItem(orbitKey)) localStorage.setItem(orbitKey, 'true'); // Set the default value in the store
-export const orbit = writable<boolean>(
-  localStorage.getItem(orbitKey) === 'true',
-);
-orbit.subscribe((val) => {
-  localStorage.setItem(orbitKey, val ? 'true' : 'false');
-});
-
+export const orbit = createBooleanStore('orbit', true);
 // ShowVertexNormals boolean
-if (!localStorage.getItem(showVertexNormalsKey))
-  localStorage.setItem(showVertexNormalsKey, 'false'); // Set the default value in the store
-export const showVertexNormals = writable<boolean>(
-  localStorage.getItem(showVertexNormalsKey) === 'true',
-);
-showVertexNormals.subscribe((val) => {
-  localStorage.setItem(showVertexNormalsKey, val ? 'true' : 'false');
-});
-
+export const showVertexNormals = createBooleanStore('showVertexNormals', false);
 // ShowSurfaceNormals boolean
-if (!localStorage.getItem(showSurfaceNormalsKey))
-  localStorage.setItem(showSurfaceNormalsKey, 'false'); // Set the default value in the store
-export const showSurfaceNormals = writable<boolean>(
-  localStorage.getItem(showSurfaceNormalsKey) === 'true',
+export const showSurfaceNormals = createBooleanStore(
+  'showSurfaceNormals',
+  false,
 );
-showSurfaceNormals.subscribe((val) => {
-  localStorage.setItem(showSurfaceNormalsKey, val ? 'true' : 'false');
-});
-
 // showSurfaceUVs boolean
-if (!localStorage.getItem(showSurfaceUVsKey))
-  localStorage.setItem(showSurfaceUVsKey, 'false'); // Set the default value in the store
-export const showSurfaceUVs = writable<boolean>(
-  localStorage.getItem(showSurfaceUVsKey) === 'true',
-);
-showSurfaceUVs.subscribe((val) => {
-  localStorage.setItem(showSurfaceUVsKey, val ? 'true' : 'false');
-});
-
+export const showSurfaceUVs = createBooleanStore('showSurfaceUVs', false);
 // smoothGeometry boolean
-if (!localStorage.getItem(smoothGeometryKey))
-  localStorage.setItem(smoothGeometryKey, 'false'); // Set the default value in the store
-export const smoothGeometry = writable<boolean>(
-  localStorage.getItem(smoothGeometryKey) === 'true',
-);
-smoothGeometry.subscribe((val) => {
-  localStorage.setItem(smoothGeometryKey, val ? 'true' : 'false');
-});
+export const smoothGeometry = createBooleanStore('smoothGeometry', false);
+export const meltyParticles = createBooleanStore('meltyParticles', false);
+export const shakyBed = createBooleanStore('shakyBed', false);
+export const wetFilament = createBooleanStore('wetFilament', false);
+export const thermalTransfer = createBooleanStore('thermalTransfer', false);
 
-export const meltyParticles = writable<boolean>(false);
-export const shakyBed = writable<boolean>(false);
-export const wetFilament = writable<boolean>(false);
-export const thermalTransfer = writable<boolean>(false);
+// Global vizualizer object so we can reference it anywhere.
+// Even though this is bad practice.
+export const visualizer = writable<Visualizer>(new Visualizer());

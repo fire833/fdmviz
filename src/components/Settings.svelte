@@ -16,6 +16,7 @@
     smoothGeometry,
     showSurfaceUVs,
     spaceDim,
+    visualizer,
   } from '../stores';
 
   const dispatchModalEvent = createEventDispatcher();
@@ -42,6 +43,14 @@
     Choose Model
   </button>
 
+  {#if $viewMode === ViewMode.SIMULATION}
+    <button
+      on:click={() => {
+        $visualizer.updatePhysics();
+      }}>Step Simulation</button
+    >
+  {/if}
+
   <div class="section">
     <h2>Visualizer Mode</h2>
 
@@ -63,40 +72,44 @@
     <h2>Parameters</h2>
 
     <div class="grid">
-      <div class="align">Layer Height (mm)</div>
-      <input
-        type="number"
-        bind:value={$layerHeight}
-        min="0.05"
-        max="2"
-        step="0.05"
-      />
-      <div class="align">Sim Speed (TPS)</div>
-      <input
-        type="number"
-        bind:value={$simSpeed}
-        min="0.25"
-        max="4.0"
-        step="0.25"
-      />
-      <div class="align">Voxel Space Dimensions</div>
-      <input
-        type="number"
-        bind:value={$spaceDim}
-        min="5"
-        max="75"
-        step="1"
-        disabled
-      />
-      <div class="align">Temperature (°C)</div>
-      <input
-        type="number"
-        bind:value={$temperature}
-        min="100"
-        max="400"
-        step="10"
-        disabled
-      />
+      {#if $viewMode === ViewMode.SHADER || $viewMode === ViewMode.TEXTURE}
+        <div class="align">Layer Height (mm)</div>
+        <input
+          type="number"
+          bind:value={$layerHeight}
+          min="0.05"
+          max="2"
+          step="0.05"
+        />
+      {/if}
+      {#if $viewMode === ViewMode.SIMULATION}
+        <div class="align">Sim Speed (TPS)</div>
+        <input
+          type="number"
+          bind:value={$simSpeed}
+          min="0.25"
+          max="4.0"
+          step="0.25"
+        />
+        <div class="align">Voxel Space Size</div>
+        <input
+          type="number"
+          bind:value={$spaceDim}
+          min="5"
+          max="75"
+          step="1"
+          disabled
+        />
+        <div class="align">Temperature (°C)</div>
+        <input
+          type="number"
+          bind:value={$temperature}
+          min="100"
+          max="400"
+          step="10"
+          disabled
+        />
+      {/if}
     </div>
   </div>
 
@@ -107,6 +120,7 @@
       <input type="checkbox" id="orbit" bind:checked={$orbit} />
       <label for="orbit">Orbit Camera</label>
     </div>
+
     <div class="left">
       <input
         type="checkbox"
@@ -115,6 +129,7 @@
       />
       <label for="vertexNormals">Show Vertex Normals</label>
     </div>
+
     <div class="left">
       <input
         type="checkbox"
@@ -123,50 +138,58 @@
       />
       <label for="surfaceNormals">Show Surface Normals</label>
     </div>
+
     <div class="left">
       <input type="checkbox" id="surfaceUVs" bind:checked={$showSurfaceUVs} />
       <label for="surfaceUVs">Show Surface UVs</label>
     </div>
-    <div class="left">
-      <input
-        type="checkbox"
-        id="smoothGeometry"
-        bind:checked={$smoothGeometry}
-      />
-      <label for="smoothGeometry">Smooth Geometry</label>
-    </div>
-    <div class="left">
-      <input
-        type="checkbox"
-        id="melty"
-        bind:checked={$meltyParticles}
-        disabled
-      />
-      <label for="melty">Melty Particles</label>
-    </div>
-    <div class="left">
-      <input type="checkbox" id="shaky" bind:checked={$shakyBed} disabled />
-      <label for="shaky">Shaky Bed</label>
-    </div>
-    <div class="left">
-      <input type="checkbox" id="wet" bind:checked={$wetFilament} disabled />
-      <label for="wet">Wet Filament</label>
-    </div>
-    <div class="left">
-      <input
-        type="checkbox"
-        id="transfer"
-        bind:checked={$thermalTransfer}
-        disabled
-      />
-      <label for="transfer">Thermal Transfer</label>
-    </div>
+
+    {#if $viewMode !== ViewMode.SIMULATION}
+      <div class="left">
+        <input
+          type="checkbox"
+          id="smoothGeometry"
+          bind:checked={$smoothGeometry}
+        />
+        <label for="smoothGeometry">Smooth Geometry</label>
+      </div>
+    {/if}
+    {#if $viewMode === ViewMode.SIMULATION}
+      <div class="left">
+        <input
+          type="checkbox"
+          id="melty"
+          bind:checked={$meltyParticles}
+          disabled
+        />
+        <label for="melty">Melty Particles</label>
+      </div>
+      <div class="left">
+        <input type="checkbox" id="shaky" bind:checked={$shakyBed} disabled />
+        <label for="shaky">Shaky Bed</label>
+      </div>
+      <div class="left">
+        <input type="checkbox" id="wet" bind:checked={$wetFilament} disabled />
+        <label for="wet">Wet Filament</label>
+      </div>
+      <div class="left">
+        <input
+          type="checkbox"
+          id="transfer"
+          bind:checked={$thermalTransfer}
+          disabled
+        />
+        <label for="transfer">Thermal Transfer</label>
+      </div>
+    {/if}
   </div>
 </div>
 
 <style>
   .ui {
     margin: auto 0;
+
+    min-width: 17rem;
 
     display: flex;
     flex-direction: column;
@@ -176,6 +199,10 @@
     overflow-x: auto;
     overflow-y: scroll;
     max-height: 80vh;
+  }
+
+  .ui::-webkit-scrollbar {
+    display: none;
   }
 
   .align {
