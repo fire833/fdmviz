@@ -112,7 +112,9 @@ export default class Visualizer {
       window.innerWidth / window.innerHeight,
       0.1,
       1000,
-    );
+    )
+      .translateX(20)
+      .translateY(12);
 
     // Add orbit controls for the mouse
     this.controls = new OrbitControls(this.camera, this.webgl.domElement);
