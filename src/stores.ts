@@ -2,56 +2,55 @@ import { writable, type Writable } from 'svelte/store';
 import { ViewMode } from './types';
 import Visualizer from './visualizer/Visualizer';
 
-const fileURLKey: string = 'fileURL';
-
-// Store for the FileURL
-export const fileURL = writable<string>(
-  localStorage.getItem(fileURLKey) || 'utah_teapot.stl',
-);
-fileURL.subscribe((val) => localStorage.setItem(fileURLKey, val));
-
-// Store for the current viewMode, should affect viewport.
-export const viewMode = writable<ViewMode>(ViewMode.RAW_STL);
-
-// Loading
-export const loadingMessages = writable<Array<String>>(new Array<String>());
-
-// Parameters
-export const layerHeight = writable<number>(0.2); // mm
-export const simSpeed = writable<number>(1); // ticks per second
-export const temperature = writable<number>(150); // °C
-export const spaceDim = writable<number>(25); // Dimension of voxel space
-
-// Features
-
-function createBooleanStore(key: string, defVal: boolean): Writable<boolean> {
-  if (!localStorage.getItem(key))
-    localStorage.setItem(key, defVal ? 'true' : 'false'); // Set the default value in the store
-  const store = writable(localStorage.getItem(key) === 'true');
+// Create a store which is kept updated & loaded with localStorage.
+function createStore<T>(key: string, initialValue: T): Writable<T> {
+  // Initialize localStorage with initialValue
+  const existingValue = localStorage.getItem(key);
+  if (!existingValue) localStorage.setItem(key, JSON.stringify(initialValue));
+  // Create store
+  var store: Writable<T>;
+  if (existingValue) store = writable(JSON.parse(existingValue));
+  else store = writable(initialValue);
+  // Update localStorage when store is updated
   store.subscribe((val) => {
-    localStorage.setItem(key, val ? 'true' : 'false');
+    localStorage.setItem(key, JSON.stringify(val));
   });
   return store;
 }
 
-// Orbit boolean
-export const orbit = createBooleanStore('orbit', true);
-// ShowVertexNormals boolean
-export const showVertexNormals = createBooleanStore('showVertexNormals', false);
-// ShowSurfaceNormals boolean
-export const showSurfaceNormals = createBooleanStore(
+/* --- SETTINGS STORES --- */
+
+// FileURL
+export const fileURL = createStore<string>('fileURL', 'utah_teapot.stl');
+
+// ViewMode
+export const viewMode = createStore<ViewMode>('viewMode', ViewMode.RAW_STL);
+
+// Parameters
+export const layerHeight = createStore<number>('layerHeight', 0.2); // mm
+export const simSpeed = createStore<number>('simSpeed', 1); // ticks per second
+export const temperature = createStore<number>('temperature', 150); // °C
+export const spaceDim = createStore<number>('spaceDim', 25); // Dimension of voxel space
+
+// Features
+export const orbit = createStore<boolean>('orbit', true);
+export const showVertexNormals = createStore<boolean>(
+  'showVertexNormals',
+  false,
+);
+export const showSurfaceNormals = createStore<boolean>(
   'showSurfaceNormals',
   false,
 );
-// showSurfaceUVs boolean
-export const showSurfaceUVs = createBooleanStore('showSurfaceUVs', false);
-// smoothGeometry boolean
-export const smoothGeometry = createBooleanStore('smoothGeometry', false);
-export const meltyParticles = createBooleanStore('meltyParticles', false);
-export const shakyBed = createBooleanStore('shakyBed', false);
-export const wetFilament = createBooleanStore('wetFilament', false);
-export const thermalTransfer = createBooleanStore('thermalTransfer', false);
+export const showSurfaceUVs = createStore<boolean>('showSurfaceUVs', false);
+export const smoothGeometry = createStore<boolean>('smoothGeometry', false);
+export const meltyParticles = createStore<boolean>('meltyParticles', false);
+export const shakyBed = createStore<boolean>('shakyBed', false);
+export const wetFilament = createStore<boolean>('wetFilament', false);
+export const thermalTransfer = createStore<boolean>('thermalTransfer', false);
 
-// Global vizualizer object so we can reference it anywhere.
-// Even though this is bad practice.
+// Loading messages
+export const loadingMessages = writable<Array<String>>(new Array<String>());
+
+// Global visualizer object
 export const visualizer = writable<Visualizer>(new Visualizer());
