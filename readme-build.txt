@@ -10,7 +10,7 @@ Yarn
 Run the following terminal command from within the `Build` directory
 to install the NPM dependencies, build the app, and serve it from localhost.
 ```
-yarn dev
+yarn install && yarn dev
 ```
 
 This typically serves the webpage at `http://localhost:5173/`, though if that port is occupied it will serve it elsewhere.
