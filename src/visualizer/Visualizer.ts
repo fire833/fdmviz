@@ -241,7 +241,7 @@ export default class Visualizer {
   ) {
     let displayGeometry: BufferGeometry = geometry.clone(); // Clone to make any modifications non-destructive (smoothGeometry)
 
-    if (doSmoothGeometry) {
+    if (doSmoothGeometry && get(viewMode) != ViewMode.SIMULATION) {
       displayGeometry = toCreasedNormals(displayGeometry, Math.PI / 5);
       displayGeometry = mergeVertices(displayGeometry);
       displayGeometry.computeVertexNormals(); // Recompute existing vertex normals
