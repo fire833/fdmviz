@@ -3,6 +3,7 @@
   import { simSpeed, visualizer } from '../stores';
   import { get } from 'svelte/store';
   import CircleProgressBar from './CircleProgressBar.svelte';
+  import ResetIcon from '../assets/ResetIcon.svg.svelte';
 
   let button: HTMLButtonElement;
 
@@ -33,11 +34,17 @@
 </script>
 
 <div class="ui">
+  <h1>Controls</h1>
   <button bind:this={button} on:click={() => handleClick()}>
-    Step Simulation
     {#key progress}
-      <CircleProgressBar {progress}></CircleProgressBar>
+      <CircleProgressBar {progress} />
     {/key}
+    <div class="center">Step</div>
+  </button>
+
+  <button on:click={() => $visualizer.resetPhysics()}>
+    <ResetIcon />
+    <div class="center">Reset</div>
   </button>
 </div>
 
@@ -45,12 +52,13 @@
   .ui {
     position: absolute;
 
-    bottom: 0;
-    left: 50vw;
-    transform: translate(-50%, 0);
+    right: 0;
+    top: 50vh;
+    transform: translate(0, -50%);
 
     display: flex;
-    border-radius: 6px 6px 0 0;
+    flex-direction: column;
+    border-radius: 6px 0 0 6px;
 
     gap: 1rem;
   }
@@ -60,5 +68,11 @@
     gap: 8px;
     display: flex;
     flex-direction: row;
+    justify-content: left;
+  }
+
+  .center {
+    display: flex;
+    text-align: center;
   }
 </style>
