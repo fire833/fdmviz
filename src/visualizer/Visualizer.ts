@@ -239,7 +239,7 @@ export default class Visualizer {
     geometry: BufferGeometry,
     doSmoothGeometry: boolean = get(smoothGeometry),
   ) {
-    let displayGeometry: BufferGeometry = geometry;
+    let displayGeometry: BufferGeometry = geometry.clone(); // Clone to make any modifications non-destructive (smoothGeometry)
 
     if (doSmoothGeometry) {
       displayGeometry = toCreasedNormals(displayGeometry, Math.PI / 5);
