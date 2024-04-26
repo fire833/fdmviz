@@ -23,12 +23,12 @@
 
   const viewModes = [
     { label: 'Raw 3D File', id: 'raw', value: ViewMode.RAW_STL },
-    { label: 'Fragment Shader', id: 'shader', value: ViewMode.SHADER },
     {
       label: 'Fluid Simulation',
       id: 'particle',
       value: ViewMode.SIMULATION,
     },
+    { label: 'Fragment Shader', id: 'shader', value: ViewMode.SHADER },
     {
       label: 'Texture Map',
       id: 'normal',
