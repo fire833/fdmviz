@@ -43,14 +43,6 @@
     Choose Model
   </button>
 
-  {#if $viewMode === ViewMode.SIMULATION}
-    <button
-      on:click={() => {
-        $visualizer.updatePhysics();
-      }}>Step Simulation</button
-    >
-  {/if}
-
   <div class="section">
     <h2>Visualizer Mode</h2>
 
