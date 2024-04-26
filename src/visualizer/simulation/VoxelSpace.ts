@@ -10,6 +10,8 @@ import {
 } from 'three';
 import { edgeTable, triTable } from './LookUpTable';
 
+export const defaultResolution = 30;
+
 export default class VoxelSpace {
   sizex: number;
   sizey: number;
@@ -40,9 +42,9 @@ export default class VoxelSpace {
   // Build a new voxelspace by a voxelizing BufferGeometry.
   constructor(
     geom: BufferGeometry,
-    spacex: number = 25,
-    spacey: number = 25,
-    spacez: number = 25,
+    spacex: number = defaultResolution,
+    spacey: number = defaultResolution,
+    spacez: number = defaultResolution,
   ) {
     this.sizex = spacex;
     this.sizey = spacey;

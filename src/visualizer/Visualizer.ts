@@ -297,6 +297,11 @@ export default class Visualizer {
     this.camera.position.x = center.x; // Aligned with front of object
     this.camera.position.y = center.y + sphere.radius * 0.9; // At the top of the object
     this.camera.position.z = center.z + sphere.radius * 1.8; // 2 radius's back
+
+    // Changes the grid position to be in the same spot as the object itself.
+    this.grid.position.x = center.x;
+    this.grid.position.y = center.y - sphere.center.y;
+    this.grid.position.z = center.z;
   }
 
   public resetPhysics() {
