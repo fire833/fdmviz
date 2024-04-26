@@ -7,7 +7,7 @@ Yarn
 
 ## Build and Serve Locally
 
-Run the following terminal command from within the `Build/fdmviz` directory
+Run the following terminal command from within the `Build` directory
 to install the NPM dependencies, build the app, and serve it from localhost.
 ```
 yarn install && yarn dev
