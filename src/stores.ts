@@ -7,14 +7,17 @@ function createStore<T>(key: string, initialValue: T): Writable<T> {
   // Initialize localStorage with initialValue
   const existingValue = localStorage.getItem(key);
   if (!existingValue) localStorage.setItem(key, JSON.stringify(initialValue));
+
   // Create store
-  var store: Writable<T>;
-  if (existingValue) store = writable(JSON.parse(existingValue));
-  else store = writable(initialValue);
+  var store: Writable<T> = existingValue
+    ? writable(JSON.parse(existingValue))
+    : writable(initialValue);
+
   // Update localStorage when store is updated
-  store.subscribe((val) => {
-    localStorage.setItem(key, JSON.stringify(val));
+  store.subscribe((value) => {
+    localStorage.setItem(key, JSON.stringify(value));
   });
+
   return store;
 }
 
