@@ -255,6 +255,7 @@ export default class Visualizer {
       displayGeometry = mergeVertices(displayGeometry);
       displayGeometry.computeVertexNormals(); // Recompute existing vertex normals
     }
+
     this.mesh.geometry.dispose();
     this.mesh.geometry = displayGeometry;
     this.normals = new VertexNormalsHelper(this.mesh, 1, 0xa4036f);
@@ -325,10 +326,10 @@ export default class Visualizer {
 
   public updatePhysics() {
     // Update simulation
-    // if (get(viewMode) === ViewMode.SIMULATION) {
+    console.debug('generating new geometry...');
     this.simulator.update(this.clock.getDelta() * this.simSpeed); // Update the physics model
-    this.populateObject(this.simulator.getGeometry()); // Regenerate the mesh based on the simulator state
-    // }
+    let geom = this.simulator.getGeometry();
+    this.populateObject(geom); // Regenerate the mesh based on the simulator state
   }
 
   public animate() {

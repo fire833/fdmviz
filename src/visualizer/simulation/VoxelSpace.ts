@@ -88,25 +88,26 @@ export default class VoxelSpace {
   }
 
   // Steps through all voxels and applies gravity transformations
-  // to the voxelspace.
-  public stepGravity(): void {
+  // to the voxelspace. Returns the number of changed voxels.
+  public stepGravity(): number {
+    let count = 0;
+
     for (let z = -(defaultResolution / 2); z < defaultResolution / 2; z++)
-      for (let y = -(defaultResolution / 2); y < defaultResolution / 2; y++)
+      for (let y = 0; y < defaultResolution - 1; y++)
         for (let x = -(defaultResolution / 2); x < defaultResolution / 2; x++) {
           let voxel: Voxel | undefined = this.getFromCoords(x, y, z);
           if (voxel) {
             // Check for the collective "tension" between all other neighbor nodes.
             let tension = this.getNeighborsTension(x, y, z);
-            if (
-              tension < 4 &&
-              this.isVoxelFreeHanging(x, y, z) &&
-              y - 1 > -(defaultResolution / 2)
-            ) {
+            if (tension < 4 && this.isVoxelFreeHanging(x, y, z) && y - 1 > 0) {
+              count++;
               this.voxels.delete(this.tupleToString([x, y, z]));
               this.voxels.set(this.tupleToString([x, y - 1, z]), voxel);
             }
           }
         }
+
+    return count;
   }
 
   // Steps through all voxels and translates temperature
