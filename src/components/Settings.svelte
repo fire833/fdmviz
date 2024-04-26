@@ -68,6 +68,7 @@
     {/each}
   </div>
 
+  {#if $viewMode !== ViewMode.RAW_STL}
   <div class="section">
     <h2>Parameters</h2>
 
@@ -112,6 +113,7 @@
       {/if}
     </div>
   </div>
+  {/if}
 
   <div class="section">
     <h2>Features</h2>
