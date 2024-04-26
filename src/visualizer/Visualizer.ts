@@ -126,6 +126,13 @@ export default class Visualizer {
     });
   }
 
+  // To resize the canvas in accordance to the window size
+  public setCanvasSize(width: number, height: number) {
+    this.webgl.setSize(width, height);
+    this.camera.aspect = width / height;
+    this.camera.updateProjectionMatrix();
+  }
+
   // Subscribe to user settings to update simulator
   public createSubscriptions() {
     fileURL.subscribe(async (value: string) => {

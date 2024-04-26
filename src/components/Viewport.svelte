@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { visualizer } from '../stores';
+    import type { Scene } from 'three';
 
   let container: HTMLElement;
 
@@ -16,6 +17,10 @@
       });
     }
   });
+
+  // Event handler for the window resizing 
+  window.addEventListener('resize', () => $visualizer.setCanvasSize(window.innerWidth ,window.innerHeight));
+
 </script>
 
 <div bind:this={container}></div>
