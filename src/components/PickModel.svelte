@@ -48,21 +48,24 @@
     dialog.showModal();
   }
 
-  export function hide()
-  {
+  export function hide() {
     dialog.close();
   }
 
-  function handleDialogClick(event: Event){
-    if(event.target && event.target == dialog) hide();
+  function handleDialogClick(event: Event) {
+    if (event.target && event.target == dialog) hide();
   }
-
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="dialog-parent" on:click={(event)=>{handleDialogClick(event)}}>
+<div
+  class="dialog-parent"
+  on:click={(event) => {
+    handleDialogClick(event);
+  }}
+>
   <dialog bind:this={dialog}>
     <div class="ui">
       <h1>Choose an STL Model</h1>
@@ -116,16 +119,16 @@
 <style>
   .dialog-parent {
     pointer-events: all;
-		visibility: hidden;
-		z-index: 100;
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
+    visibility: hidden;
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   dialog {

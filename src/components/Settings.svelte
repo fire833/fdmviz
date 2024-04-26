@@ -69,50 +69,50 @@
   </div>
 
   {#if $viewMode !== ViewMode.RAW_STL}
-  <div class="section">
-    <h2>Parameters</h2>
+    <div class="section">
+      <h2>Parameters</h2>
 
-    <div class="grid">
-      {#if $viewMode === ViewMode.SHADER || $viewMode === ViewMode.TEXTURE}
-        <div class="align">Layer Height (mm)</div>
-        <input
-          type="number"
-          bind:value={$layerHeight}
-          min="0.05"
-          max="2"
-          step="0.05"
-        />
-      {/if}
-      {#if $viewMode === ViewMode.SIMULATION}
-        <div class="align">Sim Speed (TPS)</div>
-        <input
-          type="number"
-          bind:value={$simSpeed}
-          min="0.25"
-          max="4.0"
-          step="0.25"
-        />
-        <div class="align">Voxel Space Size</div>
-        <input
-          type="number"
-          bind:value={$spaceDim}
-          min="5"
-          max="75"
-          step="1"
-          disabled
-        />
-        <div class="align">Temperature (°C)</div>
-        <input
-          type="number"
-          bind:value={$temperature}
-          min="100"
-          max="400"
-          step="10"
-          disabled
-        />
-      {/if}
+      <div class="grid">
+        {#if $viewMode === ViewMode.SHADER || $viewMode === ViewMode.TEXTURE}
+          <div class="align">Layer Height (mm)</div>
+          <input
+            type="number"
+            bind:value={$layerHeight}
+            min="0.05"
+            max="2"
+            step="0.05"
+          />
+        {/if}
+        {#if $viewMode === ViewMode.SIMULATION}
+          <div class="align">Sim Speed (TPS)</div>
+          <input
+            type="number"
+            bind:value={$simSpeed}
+            min="0.25"
+            max="4.0"
+            step="0.25"
+          />
+          <div class="align">Voxel Space Size</div>
+          <input
+            type="number"
+            bind:value={$spaceDim}
+            min="5"
+            max="75"
+            step="1"
+            disabled
+          />
+          <div class="align">Temperature (°C)</div>
+          <input
+            type="number"
+            bind:value={$temperature}
+            min="100"
+            max="400"
+            step="10"
+            disabled
+          />
+        {/if}
+      </div>
     </div>
-  </div>
   {/if}
 
   <div class="section">
