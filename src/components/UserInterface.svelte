@@ -15,7 +15,6 @@
 <Settings on:openModal={modal.showModal()}></Settings>
 <GitHub></GitHub>
 <Loading></Loading>
-<SimControls></SimControls>
 {#if $viewMode == ViewMode.SIMULATION}
   <SimControls></SimControls>
 {/if}
