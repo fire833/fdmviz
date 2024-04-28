@@ -10,7 +10,7 @@ import {
 } from 'three';
 import { edgeTable, triTable } from './LookUpTable';
 
-export const defaultResolution = 30;
+export const defaultResolution = 15;
 
 export default class VoxelSpace {
   sizex: number;
@@ -36,8 +36,6 @@ export default class VoxelSpace {
     new Vector3(0, 0, -1),
     new Vector3(0, 0, 1),
   );
-
-  private isolevel = 0.5;
 
   // Build a new voxelspace by a voxelizing BufferGeometry.
   constructor(
@@ -78,10 +76,9 @@ export default class VoxelSpace {
       for (let y = 0; y < this.sizey; y++) {
         for (let z = 0; z < this.sizez; z++) {
           const nx = x * this.meshstepx + this.minx;
-          const ny = x * this.meshstepy + this.miny;
-          const nz = x * this.meshstepz + this.minz;
+          const ny = y * this.meshstepy + this.miny;
+          const nz = z * this.meshstepz + this.minz;
           if (this.insideMesh(raycaster, new Vector3(nx, ny, nz), mesh)) {
-            // console.log(`found voxel at (${x},${y},${z})`);
             voxels.set(this.tupleToString([x, y, z]), new Voxel(z));
           }
         }
@@ -272,12 +269,12 @@ export default class VoxelSpace {
               val1.x,
               val1.y,
               val1.z,
-              val2.x,
-              val2.y,
-              val2.z,
               val3.x,
               val3.y,
               val3.z,
+              val2.x,
+              val2.y,
+              val2.z,
             );
 
             i += 3;
@@ -313,14 +310,14 @@ export default class VoxelSpace {
   public stepGravity(): number {
     let count = 0;
 
-    for (let z = -(defaultResolution / 2); z < defaultResolution / 2; z++)
-      for (let y = 0; y < defaultResolution - 1; y++)
-        for (let x = -(defaultResolution / 2); x < defaultResolution / 2; x++) {
+    for (let z = 0; z < this.sizez; z++)
+      for (let y = this.sizey; y > 0; y--)
+        for (let x = 0; x < this.sizex; x++) {
           let voxel: Voxel | undefined = this.getFromCoords(x, y, z);
           if (voxel) {
             // Check for the collective "tension" between all other neighbor nodes.
             let tension = this.getNeighborsTension(x, y, z);
-            if (tension < 4 && this.isVoxelFreeHanging(x, y, z) && y - 1 > 0) {
+            if (tension < 6 && this.isVoxelFreeHanging(x, y, z) && y - 1 > 0) {
               count++;
               this.voxels.delete(this.tupleToString([x, y, z]));
               this.voxels.set(this.tupleToString([x, y - 1, z]), voxel);
