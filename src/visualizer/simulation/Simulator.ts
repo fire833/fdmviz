@@ -8,16 +8,14 @@ import { marchingCubes } from './MarchingCubes';
 import VoxelSpace, { defaultResolution } from './VoxelSpace';
 
 export default class Simulator {
-  private geometry: BufferGeometry | null;
   private voxelSpace: VoxelSpace | undefined;
   private maxPolygons = 30000;
-  private points: Vector3[] = [];
-  private values: number[] = [];
 
   constructor(geom: BufferGeometry) {
-    this.geometry = null;
     this.reset();
+    console.time('createVoxelSpace');
     this.voxelSpace = new VoxelSpace(geom);
+    console.timeEnd('createVoxelSpace');
     this.generateVoxels();
   }
 
@@ -25,23 +23,37 @@ export default class Simulator {
   public reset() {}
 
   // Step the simulator forward by (delta) time
-  public update(delta: number) {}
-
-  generateVoxels(): void {
-    this.points = [];
-
-    for (let x = -(defaultResolution / 2); x < defaultResolution / 2; x++) {
-      for (let y = -(defaultResolution / 2); y < defaultResolution / 2; y++) {
-        for (let z = -(defaultResolution / 2); z < defaultResolution / 2; z++) {
-          this.points.push(new Vector3(x, y, z));
-          this.values.push(this.voxelSpace?.getFromCoords(x, y, z) ? 0 : 1); // 0 if populated, 1 if empty
-        }
-      }
+  public update(delta: number) {
+    if (this.voxelSpace) {
+      console.debug('stepping through gravity in the fluid simulation');
+      console.time('gravityStep');
+      let changed = this.voxelSpace.stepGravity();
+      console.timeEnd('gravityStep');
+      console.debug(`moved ${changed} voxels in this step`);
+      console.time('temperatureStep');
+      this.voxelSpace.stepTemperature();
+      console.timeEnd('temperatureStep');
     }
   }
 
+  generateVoxels(): [Vector3[], number[]] {
+    let points = [];
+    let values = [];
+
+    for (let x = -(defaultResolution / 2); x < defaultResolution / 2; x++) {
+      for (let y = 0; y < defaultResolution; y++)
+        for (let z = -(defaultResolution / 2); z < defaultResolution / 2; z++) {
+          points.push(new Vector3(x, y, z));
+          values.push(this.voxelSpace?.getFromCoords(x, y, z) ? 0 : 1); // 0 if populated, 1 if empty
+        }
+    }
+
+    return [points, values];
+  }
+
   getTriangles(): Vector3[] {
-    return marchingCubes(this.points, this.values);
+    let [points, values] = this.generateVoxels();
+    return marchingCubes(points, values);
   }
 
   private generateGeometry(): BufferGeometry {
@@ -72,23 +84,18 @@ export default class Simulator {
     let min = geometry.boundingBox?.min;
     let max = geometry.boundingBox?.max;
     console.debug(
-      `generated cubes mesh: (${min?.x}, ${min?.y}, ${min?.z}) -> (${max?.x}, ${max?.y}, ${max?.z})`,
+      `generated cubes mesh: ${geometry.uuid} (${min?.x}, ${min?.y}, ${min?.z}) -> (${max?.x}, ${max?.y}, ${max?.z})`,
     );
 
-    if (this.geometry) this.geometry.dispose();
-    this.geometry = geometry;
     return geometry;
   }
 
   getGeometry(): BufferGeometry {
-    // Return memoized geometry
-    if (this.geometry) return this.geometry;
     // Return generated geometry
-    else {
-      if (this.voxelSpace) {
-        this.geometry = this.voxelSpace.exportGeometry();
-        return this.geometry;
-      } else return new BufferGeometry();
-    }
+    console.time('generateGeometry');
+    let geom = this.voxelSpace?.exportGeometry();
+    if (geom === undefined) geom = new BufferGeometry();
+    console.timeEnd('generateGeometry');
+    return geom;
   }
 }

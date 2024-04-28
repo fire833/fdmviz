@@ -112,7 +112,9 @@ export default class Visualizer {
       window.innerWidth / window.innerHeight,
       0.1,
       1000,
-    );
+    )
+      .translateX(20)
+      .translateY(12);
 
     // Add orbit controls for the mouse
     this.controls = new OrbitControls(this.camera, this.webgl.domElement);
@@ -124,6 +126,13 @@ export default class Visualizer {
     this.loadBaseGeometry().then(() => {
       this.createSubscriptions();
     });
+  }
+
+  // To resize the canvas in accordance to the window size
+  public setCanvasSize(width: number, height: number) {
+    this.webgl.setSize(width, height);
+    this.camera.aspect = width / height;
+    this.camera.updateProjectionMatrix();
   }
 
   // Subscribe to user settings to update simulator
@@ -239,13 +248,14 @@ export default class Visualizer {
     geometry: BufferGeometry,
     doSmoothGeometry: boolean = get(smoothGeometry),
   ) {
-    let displayGeometry: BufferGeometry = geometry.clone();
+    let displayGeometry: BufferGeometry = geometry.clone(); // Clone to make any modifications non-destructive (smoothGeometry)
 
-    if (doSmoothGeometry) {
+    if (doSmoothGeometry && get(viewMode) != ViewMode.SIMULATION) {
       displayGeometry = toCreasedNormals(displayGeometry, Math.PI / 5);
       displayGeometry = mergeVertices(displayGeometry);
       displayGeometry.computeVertexNormals(); // Recompute existing vertex normals
     }
+
     this.mesh.geometry.dispose();
     this.mesh.geometry = displayGeometry;
     this.normals = new VertexNormalsHelper(this.mesh, 1, 0xa4036f);
@@ -312,12 +322,14 @@ export default class Visualizer {
   public updateScene() {
     // Update view based on controls (mouse)
     this.controls.update();
+  }
 
+  public updatePhysics() {
     // Update simulation
-    if (get(viewMode) == ViewMode.SIMULATION) {
-      this.simulator.update(this.clock.getDelta() * this.simSpeed); // Update the physics model
-      this.populateObject(this.simulator.getGeometry()); // Regenerate the mesh based on the simulator state
-    }
+    console.debug('generating new geometry...');
+    this.simulator.update(this.clock.getDelta() * this.simSpeed); // Update the physics model
+    let geom = this.simulator.getGeometry();
+    this.populateObject(geom); // Regenerate the mesh based on the simulator state
   }
 
   public animate() {

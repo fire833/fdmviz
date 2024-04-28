@@ -1,85 +1,59 @@
-import { writable } from 'svelte/store';
+import { writable, type Writable } from 'svelte/store';
 import { ViewMode } from './types';
+import Visualizer from './visualizer/Visualizer';
 
-const fileURLKey: string = 'fileURL';
-const orbitKey: string = 'orbit';
-const showVertexNormalsKey: string = 'showVertexNormals';
-const showSurfaceNormalsKey: string = 'showSurfaceNormals';
-const showSurfaceUVsKey: string = 'showSurfaceUVs';
-const smoothGeometryKey: string = 'smoothGeometry';
+// Create a store which is kept updated & loaded with localStorage.
+function createStore<T>(key: string, initialValue: T): Writable<T> {
+  // Initialize localStorage with initialValue
+  const existingValue = localStorage.getItem(key);
+  if (!existingValue) localStorage.setItem(key, JSON.stringify(initialValue));
 
-export const openModal = writable<boolean>(false);
+  // Create store
+  var store: Writable<T> = existingValue
+    ? writable(JSON.parse(existingValue))
+    : writable(initialValue);
 
-// Store for the FileURL
-export const fileURL = writable<string>(
-  localStorage.getItem(fileURLKey) || 'utah_teapot.stl',
-);
-fileURL.subscribe((val) => localStorage.setItem(fileURLKey, val));
+  // Update localStorage when store is updated
+  store.subscribe((value) => {
+    localStorage.setItem(key, JSON.stringify(value));
+  });
 
-// Store for the current viewMode, should affect viewport.
-export const viewMode = writable<ViewMode>(ViewMode.RAW_STL);
+  return store;
+}
 
-// Loading
-export const loadingMessages = writable<Array<String>>(new Array<String>());
+/* --- SETTINGS STORES --- */
+
+// FileURL
+export const fileURL = createStore<string>('fileURL', 'utah_teapot.stl');
+
+// ViewMode
+export const viewMode = createStore<ViewMode>('viewMode', ViewMode.RAW_STL);
 
 // Parameters
-export const layerHeight = writable<number>(0.2); // mm
-export const simSpeed = writable<number>(1); // ticks per second
-export const temperature = writable<number>(150); // °C
-export const spaceDim = writable<number>(25); // Dimension of voxel space
+export const layerHeight = createStore<number>('layerHeight', 0.2); // mm
+export const simSpeed = createStore<number>('simSpeed', 1); // ticks per second
+export const temperature = createStore<number>('temperature', 150); // °C
+export const spaceDim = createStore<number>('spaceDim', 25); // Dimension of voxel space
 
 // Features
-
-// Orbit boolean
-if (!localStorage.getItem(orbitKey)) localStorage.setItem(orbitKey, 'true'); // Set the default value in the store
-export const orbit = writable<boolean>(
-  localStorage.getItem(orbitKey) === 'true',
+export const orbit = createStore<boolean>('orbit', true);
+export const showVertexNormals = createStore<boolean>(
+  'showVertexNormals',
+  false,
 );
-orbit.subscribe((val) => {
-  localStorage.setItem(orbitKey, val ? 'true' : 'false');
-});
-
-// ShowVertexNormals boolean
-if (!localStorage.getItem(showVertexNormalsKey))
-  localStorage.setItem(showVertexNormalsKey, 'false'); // Set the default value in the store
-export const showVertexNormals = writable<boolean>(
-  localStorage.getItem(showVertexNormalsKey) === 'true',
+export const showSurfaceNormals = createStore<boolean>(
+  'showSurfaceNormals',
+  false,
 );
-showVertexNormals.subscribe((val) => {
-  localStorage.setItem(showVertexNormalsKey, val ? 'true' : 'false');
-});
+export const showSurfaceUVs = createStore<boolean>('showSurfaceUVs', false);
+export const smoothGeometry = createStore<boolean>('smoothGeometry', false);
+export const meltyParticles = createStore<boolean>('meltyParticles', false);
+export const shakyBed = createStore<boolean>('shakyBed', false);
+export const wetFilament = createStore<boolean>('wetFilament', false);
+export const thermalTransfer = createStore<boolean>('thermalTransfer', false);
 
-// ShowSurfaceNormals boolean
-if (!localStorage.getItem(showSurfaceNormalsKey))
-  localStorage.setItem(showSurfaceNormalsKey, 'false'); // Set the default value in the store
-export const showSurfaceNormals = writable<boolean>(
-  localStorage.getItem(showSurfaceNormalsKey) === 'true',
-);
-showSurfaceNormals.subscribe((val) => {
-  localStorage.setItem(showSurfaceNormalsKey, val ? 'true' : 'false');
-});
+// Loading messages
+export const loadingMessages = writable<Array<String>>(new Array<String>());
 
-// showSurfaceUVs boolean
-if (!localStorage.getItem(showSurfaceUVsKey))
-  localStorage.setItem(showSurfaceUVsKey, 'false'); // Set the default value in the store
-export const showSurfaceUVs = writable<boolean>(
-  localStorage.getItem(showSurfaceUVsKey) === 'true',
-);
-showSurfaceUVs.subscribe((val) => {
-  localStorage.setItem(showSurfaceUVsKey, val ? 'true' : 'false');
-});
-
-// smoothGeometry boolean
-if (!localStorage.getItem(smoothGeometryKey))
-  localStorage.setItem(smoothGeometryKey, 'false'); // Set the default value in the store
-export const smoothGeometry = writable<boolean>(
-  localStorage.getItem(smoothGeometryKey) === 'true',
-);
-smoothGeometry.subscribe((val) => {
-  localStorage.setItem(smoothGeometryKey, val ? 'true' : 'false');
-});
-
-export const meltyParticles = writable<boolean>(false);
-export const shakyBed = writable<boolean>(false);
-export const wetFilament = writable<boolean>(false);
-export const thermalTransfer = writable<boolean>(false);
+// Global visualizer object
+export const visualizer = writable<Visualizer>(new Visualizer());

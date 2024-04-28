@@ -307,6 +307,53 @@ export default class VoxelSpace {
     // Return the computed geometry.
     return geom;
   }
+
+  // Steps through all voxels and applies gravity transformations
+  // to the voxelspace. Returns the number of changed voxels.
+  public stepGravity(): number {
+    let count = 0;
+
+    for (let z = -(defaultResolution / 2); z < defaultResolution / 2; z++)
+      for (let y = 0; y < defaultResolution - 1; y++)
+        for (let x = -(defaultResolution / 2); x < defaultResolution / 2; x++) {
+          let voxel: Voxel | undefined = this.getFromCoords(x, y, z);
+          if (voxel) {
+            // Check for the collective "tension" between all other neighbor nodes.
+            let tension = this.getNeighborsTension(x, y, z);
+            if (tension < 4 && this.isVoxelFreeHanging(x, y, z) && y - 1 > 0) {
+              count++;
+              this.voxels.delete(this.tupleToString([x, y, z]));
+              this.voxels.set(this.tupleToString([x, y - 1, z]), voxel);
+            }
+          }
+        }
+
+    return count;
+  }
+
+  // Steps through all voxels and translates temperature
+  public stepTemperature(): void {}
+
+  // Returns the relative "tension" between all relative neighbors,
+  // if they exist, and returns a sum for upstream computation.
+  private getNeighborsTension(x: number, y: number, z: number): number {
+    let sum = 0;
+    if (this.voxels.has(this.tupleToString([x + 1, y, z]))) sum++;
+    if (this.voxels.has(this.tupleToString([x - 1, y, z]))) sum++;
+    if (this.voxels.has(this.tupleToString([x, y + 1, z]))) sum++;
+    if (this.voxels.has(this.tupleToString([x, y, z + 1]))) sum++;
+    if (this.voxels.has(this.tupleToString([x, y, z - 1]))) sum++;
+    if (this.voxels.has(this.tupleToString([x + 1, y, z + 1]))) sum++;
+    if (this.voxels.has(this.tupleToString([x - 1, y, z + 1]))) sum++;
+    if (this.voxels.has(this.tupleToString([x + 1, y, z - 1]))) sum++;
+    if (this.voxels.has(this.tupleToString([x - 1, y, z - 1]))) sum++;
+
+    return sum;
+  }
+
+  private isVoxelFreeHanging(x: number, y: number, z: number): boolean {
+    return !this.voxels.has(this.tupleToString([x, y - 1, z]));
+  }
 }
 
 // The primary class containing any useful state for a Voxel within
