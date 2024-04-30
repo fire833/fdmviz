@@ -14,9 +14,9 @@ export function marchingCubes(points: Vector3[], values: number[]): Vector3[] {
   // mesh triangles
   let trianglePoints: Vector3[] = [];
 
-  for (var z = 0; z < defaultResolution; z++)
-    for (var y = 0; y < defaultResolution; y++)
-      for (var x = 0; x < defaultResolution; x++) {
+  for (var z = 0; z < defaultResolution - 1; z++)
+    for (var y = 0; y < defaultResolution - 1; y++)
+      for (var x = 0; x < defaultResolution - 1; x++) {
         // indexes of points in the cube
         var p = x + defaultResolution * y + resolution2 * z,
           px = p + 1,
