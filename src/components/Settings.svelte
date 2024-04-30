@@ -5,18 +5,11 @@
     viewMode,
     simSpeed,
     layerHeight,
-    temperature,
     showVertexNormals,
-    meltyParticles,
-    shakyBed,
-    wetFilament,
-    thermalTransfer,
     showSurfaceNormals,
     orbit,
     smoothGeometry,
     showSurfaceUVs,
-    spaceDim,
-    visualizer,
   } from '../stores';
 
   const dispatchModalEvent = createEventDispatcher();

@@ -24,7 +24,7 @@ function createStore<T>(key: string, initialValue: T): Writable<T> {
 /* --- SETTINGS STORES --- */
 
 // FileURL
-export const fileURL = createStore<string>('fileURL', 'utah_teapot.stl');
+export const fileURL = writable<string>('utah_teapot.stl');
 
 // ViewMode
 export const viewMode = createStore<ViewMode>('viewMode', ViewMode.RAW_STL);
