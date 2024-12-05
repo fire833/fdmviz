@@ -59,7 +59,7 @@ export default class Simulator {
   private generateGeometry(): BufferGeometry {
     let geometry = new BufferGeometry();
 
-    const vertices = Array(3 * this.maxPolygons).fill(0);
+    const vertices: Array<number> = Array(3 * this.maxPolygons).fill(0);
     let trianglePoints: Vector3[] = this.getTriangles();
 
     for (let i = 0; i < trianglePoints.length; i++) {
@@ -93,7 +93,8 @@ export default class Simulator {
   getGeometry(): BufferGeometry {
     // Return generated geometry
     console.time('generateGeometry');
-    let geom = this.generateGeometry();
+    let geom = this.voxelSpace?.exportGeometry();
+    if (geom === undefined) geom = new BufferGeometry();
     console.timeEnd('generateGeometry');
     return geom;
   }
